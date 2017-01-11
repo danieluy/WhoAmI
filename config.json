@@ -1,0 +1,7 @@
+{
+  "session":{
+    "secret": "NO REAL SECRET HERE ;)",
+    "durationHours": 2400,
+    "activeDurationHours": 100
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "who_am_i",
+  "version": "0.1.0",
+  "description": "Implementation on the game \"\"\u001b[DWho am I?\"",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danieluy/who_am_i.git"
+  },
+  "author": {
+    "name": "Daniel Sosa",
+    "email": "danielsosa.dev@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "client-sessions": "^0.7.0",
+    "express": "^4.13.4",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "css-loader": "^0.26.1",
+    "ignore-styles": "^5.0.1",
+    "mocha": "^3.2.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.14.0"
+  },
+  "bugs": {
+    "url": "https://github.com/danieluy/who_am_i/issues"
+  },
+  "homepage": "https://github.com/danieluy/who_am_i#readme"
+}
