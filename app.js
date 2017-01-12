@@ -8,9 +8,9 @@ const path = require('path');
 const bodyParser = require("body-parser");
 const sessions = require('client-sessions');
 
-const users = require('./my_modules/users.js');
-const User = users.User;
-const list = users.list;
+
+const User = require('./my_modules/user.js');
+const Game = require('./my_modules/game.js');
 
 const CONFIG = require('./config.json');
 
@@ -43,19 +43,26 @@ app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// HttpPOST  ///////////////////////////////////////////////////////////////////
-
 // Socket.IO ///////////////////////////////////////////////////////////////////
+const games = {};
 
 io.on('connection', function (socket) {
-  socket.on('login', function(data){
-    const user = Object.create(User);
-    user.username = data.username;
-    list.add(user);
-  });
+
+  socket.on('createGame', function (data) {
+    if (!games.hasOwnProperty(data.gameId)) {
+      games[data.gameId] = Object.create(Game);
+      games[data.gameId].id = data.gameId;
+      games[data.gameId].sockets.push(socket);
+    }
+    else {
+      socket.emit('ERROR', `There is already a game called ${data.gameId}`);
+    }
+  })
+
   socket.on('disconnect', function () {
-    console.log('user disconnected');
+    // console.log('user disconnected');
   });
+
 });
 
 // 404 /////////////////////////////////////////////////////////////////////////

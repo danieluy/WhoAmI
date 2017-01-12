@@ -1,34 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <link href="img/favicon.png" rel="icon" type="image/png"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Who Am I</title>
-    <script src="js/main-bundle.js" type="text/javascript"></script>
-    <!--<script type="text/javascript" src="../js/mustache.min.js"></script>-->
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <h1>Who Am I</h1>
-    <div class="login-box">
-        <input id="login-input" type="text" placeholder="Choose a username">
-        <button id="login-button">Done</button>
+
+<head>
+  <meta charset="utf-8">
+  <link href="img/favicon.png" rel="icon" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Who Am I</title>
+  <script src="js/main-bundle.js" type="text/javascript"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <h1>Who Am I</h1>
+  <div>
+    <input id="game-input" type="text" placeholder="Game name">
+    <button id="game-button">Send</button>
+  </div>
+  <!--<div class="users-wrapper" style="display:none">
+    <div class="user-card">
+      <span class="user-name">Daniel</span>
+      <label for="">Character: </label>
+      <span class="user-character">... ... ...</span>
     </div>
-    <div class="users-wrapper" style="display:none;">
-      <div class="user-card">
-        <span class="user-name">Daniel</span>
-        <label for="">Character: </label>
-        <span class="user-character">... ... ...</span>
-      </div>
-      <div class="user-card">
-        <span class="user-name">Otro usuario</span>
-        <label for="">Character: </label>
-        <span class="user-character">Un Personaje</span>
-      </div>
+    <div class="user-card">
+      <span class="user-name">Otro usuario</span>
+      <label for="">Character: </label>
+      <span class="user-character">Un Personaje</span>
     </div>
-    <script>
-      var socket = io();
-    </script>
-  </body>
+  </div>-->
+</body>
+
 </html>

@@ -6,13 +6,13 @@ module.exports = {
     filename: 'main-bundle.js',
     path: './public/js'
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
-  ],
+  // plugins: [
+  //   new webpack.optimize.UglifyJsPlugin({
+  //     compress: {
+  //       warnings: false
+  //     }
+  //   })
+  // ],
   module: {
     loaders: [
       {
