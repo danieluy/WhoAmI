@@ -11,23 +11,23 @@
 </head>
 
 <body>
+  
   <h1>Who Am I</h1>
-  <div>
-    <input id="game-input" type="text" placeholder="Game name">
-    <button id="game-button">Send</button>
+  
+  <div class="start-wrapper">
+    <input id="player-name" type="text" placeholder="Player name">
+    <input id="game-name" type="text" placeholder="Game name">
+    <button id="new-game-button">New Game</button>
+    <button id="join-game-button">Join Game</button>
   </div>
-  <!--<div class="users-wrapper" style="display:none">
-    <div class="user-card">
-      <span class="user-name">Daniel</span>
-      <label for="">Character: </label>
-      <span class="user-character">... ... ...</span>
-    </div>
-    <div class="user-card">
-      <span class="user-name">Otro usuario</span>
-      <label for="">Character: </label>
-      <span class="user-character">Un Personaje</span>
-    </div>
-  </div>-->
+  
+  <div class="select-character-wrapper">
+    <input id="character-name" type="text" placeholder="Character name">
+    <button id="input-character-button">Done</button>
+  </div>
+  
+  <div id="players-wrapper"></div>
+  
 </body>
 
 </html>

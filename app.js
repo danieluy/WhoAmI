@@ -9,8 +9,9 @@ const bodyParser = require("body-parser");
 const sessions = require('client-sessions');
 
 
-const User = require('./my_modules/user.js');
+const Player = require('./my_modules/player.js');
 const Game = require('./my_modules/game.js');
+const Character = require('./my_modules/character.js');
 
 const CONFIG = require('./config.json');
 
@@ -50,17 +51,44 @@ io.on('connection', function (socket) {
 
   socket.on('createGame', function (data) {
     if (!games.hasOwnProperty(data.gameId)) {
-      games[data.gameId] = Object.create(Game);
-      games[data.gameId].id = data.gameId;
-      games[data.gameId].sockets.push(socket);
+      let p = Object.create(Player);
+      let g = Object.create(Game);
+      p.username = data.username;
+      p.id = socket.id;
+      g.players.push(p);
+      g.sockets[socket.id] = socket;
+      games[data.gameId] = g;
+      games[data.gameId].emitUpdatePlayers();
     }
     else {
-      socket.emit('ERROR', `There is already a game called ${data.gameId}`);
+      socket.emit('ERROR', { code: 'duplicatedGame', message: `There is already a game called ${data.gameId}` });
     }
   })
 
+  socket.on('joinGame', function (data) {
+    if (games.hasOwnProperty(data.gameId)) {
+      let p = Object.create(Player);
+      p.username = data.username;
+      p.id = socket.id;
+      games[data.gameId].players.push(p);
+      games[data.gameId].sockets[socket.id] = socket;
+      games[data.gameId].emitUpdatePlayers();
+    }
+    else {
+      socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exist` });
+    }
+  })
+
+  socket.on('inputCharacter', function (data) {
+    let c = Object.create(Character);
+    c.description = data.character;
+    c.inputBy = data.playerId;
+    games[data.gameId].characters.push(c);
+    socket.emit('TEST', games[data.gameId].characters);
+  })
+
   socket.on('disconnect', function () {
-    // console.log('user disconnected');
+    // console.log('player disconnected');
   });
 
 });
