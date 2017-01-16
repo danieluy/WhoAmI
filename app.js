@@ -6,7 +6,6 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
 const bodyParser = require("body-parser");
-const sessions = require('client-sessions');
 
 
 const Player = require('./my_modules/player.js');
@@ -17,23 +16,6 @@ const CONFIG = require('./config.json');
 
 //  Public folders  ////////////////////////////////////////////////////////////
 app.use(express.static(path.join(__dirname, '/public')));
-
-// Session Config. /////////////////////////////////////////////////////////////
-const secret = CONFIG.session.secret;
-const duration = CONFIG.session.durationHours;
-const activeDuration = CONFIG.session.activeDurationHours;
-app.use(sessions({
-  cookieName: 'session',
-  secret: secret,
-  duration: duration * 60 * 60 * 1000,
-  activeDuration: activeDuration * 60 * 60 * 1000,
-  cookie:
-  {
-    ephemeral: false,
-    httpOnly: false,
-    secure: false
-  }
-}));
 
 // Middleware //////////////////////////////////////////////////////////////////
 app.use(bodyParser.urlencoded({ extended: false }));

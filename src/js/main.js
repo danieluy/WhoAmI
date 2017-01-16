@@ -1,7 +1,5 @@
 require('../css/main.css');
 
-const dsAjax = require('./ds-ajax.js');
-
 // window.addEventListener("beforeunload", function (e) {
 //   e.returnValue = "";
 //   return confirmationMessage;
@@ -10,8 +8,6 @@ const dsAjax = require('./ds-ajax.js');
 document.addEventListener("DOMContentLoaded", function (event) {
   $main.init();
 });
-
-var socket = null;
 
 var $main = {
   gameData: {
@@ -32,6 +28,7 @@ var $main = {
   },
 
   logTest: function(data){
+    console.log('<<< TEST >>>')
     console.log(data)
   },
 
