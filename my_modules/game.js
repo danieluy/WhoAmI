@@ -1,18 +1,30 @@
 "use strict";
 
 const Game = {
-  players: [],
+  players: {},
   sockets: {},
-  characters: [],
-  emitUpdatePlayers: function() {
-    for (let i = 0; i < this.players.length; i++)
-      this.sockets[this.players[i].id].emit('updatePlayers', this.players);
+  characters: {},
+  addSocket: function (socket) {
+    if (this.sockets.hasOwnProperty(socket.id))
+      throw 'Socket already exists';
+    else
+      this.sockets[socket.id] = socket;
   },
-  getPlayer(playerId){
-    for(let i=0; i<this.players.length; i++)
-      if(this.players[i].id === playerId)
-        return this.players[i];
-    return null;
+  addPlayer: function (player) {
+    if (this.players.hasOwnProperty(player.id))
+      throw 'Player already exists';
+    else
+      this.players[player.id] = player;
+  },
+  addCharacter: function (character) {
+    if (this.characters.hasOwnProperty(character.id))
+      throw 'Character already exists';
+    else
+      this.characters[character.id] = character;
+  },
+  emitUpdatePlayers: function () {
+    for (key in this.players)
+      this.sockets[key].emit('updatePlayers', this.players);
   }
 }
 

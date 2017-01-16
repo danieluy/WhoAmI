@@ -1,10 +1,11 @@
 "use strict";
 
 const Character = {
-  description: undefined,
+  id:  null,
+  description: null,
   qa: [],
-  assignedTo: undefined,
-  inputBy: undefined
+  assignedTo: null,
+  inputBy: null
 }
 
 module.exports = Character;

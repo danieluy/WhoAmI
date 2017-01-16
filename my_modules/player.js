@@ -1,8 +1,8 @@
 "use strict";
 
 const Player = {
-  id: undefined,
-  username: undefined
+  id: null,
+  username: null
 }
 
 module.exports = Player;

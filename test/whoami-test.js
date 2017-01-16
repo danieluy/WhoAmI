@@ -1,27 +1,49 @@
-const assert = require('assert');
+const assert = require('chai').assert;
+const expect = require('chai').expect;
 
-describe('users.js', function () {
-  let users;
-  let list;
-  let User;
+describe('player.js', function () {
+  let Player;
 
   before(function () {
-    users = require('../my_modules/users.js');
-    list = users.list;
-    User = users.User;
+    Player = require('../my_modules/player.js');
   });
 
-  it('should instantiate a User', function () {
-    const u1 = Object.create(User);
-    assert.ok(User.isPrototypeOf(u1));
+  it('should instantiate a Player', function () {
+    const p = Object.create(Player);
+    assert.isTrue(Player.isPrototypeOf(p));
   });
 
-  it('should add a User', function () {
-    const u1 = Object.create(User);
-    let length = list.length;
-    list.add(u1);
-    assert.equal(length+1, list.length);
-    assert.ok(User.isPrototypeOf(list.item(0)));
+});
+
+describe('game.js', function () {
+  let Game;
+
+  before(function () {
+    Game = require('../my_modules/game.js');
+  });
+
+  it('should instantiate a Game', function () {
+    const g = Object.create(Game);
+    assert.isTrue(Game.isPrototypeOf(g));
+  });
+
+  it('should add a Game', function () {
+    const g = Object.create(Game);
+    assert.isTrue(Game.isPrototypeOf(g));
+  });
+
+});
+
+describe('character.js', function () {
+  let Character;
+
+  before(function () {
+    Character = require('../my_modules/character.js');
+  });
+
+  it('should instantiate a Character', function () {
+    const c = Object.create(Character);
+    assert.isTrue(Character.isPrototypeOf(c));
   });
 
 });

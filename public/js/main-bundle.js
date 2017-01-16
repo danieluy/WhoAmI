@@ -206,7 +206,7 @@
 
 
 	// module
-	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\n*, html{\n   margin: 0px;\n   padding: 0px;\n   box-sizing: border-box;\n   font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\n   color: #333;\n   font-size: 16px;\n}\nbody{\n   font-family: Roboto, sans-serif;\n   color: #333;\n   font-size: 16px;\n}\n/*--  Users  -----------------------------------------------------------------*/\n.users-wrapper{\n  width: 100%;\n  display: flex;\n  flex-direction: row;\n}\n.user-card{\n  width: 25%;\n}\n.user-name{\n  display: block;\n  font-size: 2rem;\n}", ""]);
+	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n   margin: 0px;\r\n   padding: 0px;\r\n   box-sizing: border-box;\r\n   font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\nbody{\r\n   font-family: Roboto, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\n/*--  Users  -----------------------------------------------------------------*/\r\n.users-wrapper{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}", ""]);
 
 	// exports
 
