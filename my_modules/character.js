@@ -5,7 +5,12 @@ const Character = {
   description: null,
   qa: [],
   assignedTo: null,
-  inputBy: null
+  inputBy: null,
+  create: function (id) {
+    const instance = Object.create(this);
+    instance.id = id;
+    return instance;
+  }
 }
 
 module.exports = Character;

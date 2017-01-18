@@ -23,7 +23,7 @@ var $main = {
       this.socket.on('ERROR', this.errorHandler.bind(this));
       this.socket.on('TEST', this.logTest.bind(this));
       this.socket.on('updatePlayers', this.render.updatePlayers.bind(this));
-      this.socket.on('inputDone', this.inputCharacterDone.bind(this));
+      this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
     }
   },
 
@@ -95,7 +95,7 @@ var $main = {
     updatePlayers: function (players) {
       this.gameData.playersList = players;
       document.getElementById('players-wrapper').innerHTML = '';
-      for (let i = 0; i < players.length; i++) {
+      for (var i = 0; i < players.length; i++) {
         var pre = document.createElement('pre');
         pre.innerHTML = JSON.stringify(players[i], null, 2);
         document.getElementById('players-wrapper').appendChild(pre);

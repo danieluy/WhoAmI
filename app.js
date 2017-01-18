@@ -33,14 +33,19 @@ io.on('connection', function (socket) {
 
   socket.on('createGame', function (data) {
     if (!games.hasOwnProperty(data.gameId)) {
-      let p = Object.create(Player);
-      let g = Object.create(Game);
-      p.username = data.username;
-      p.id = socket.id;
-      g.players.push(p);
-      g.sockets[socket.id] = socket;
+      const g = Game.create(data.gameId);
       games[data.gameId] = g;
-      games[data.gameId].emitUpdatePlayers();
+      const p = Player.create(socket.id, data.username);
+      try {
+        g.player.add(p);// should be a GameOwner  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        g.socket.add(socket);
+        // TODO update players list  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      } catch (err) {
+        if(err.message === 'Player already exists')
+          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
+        if(err.message === 'Socket already exists')
+          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated socket id: ${data.username}` });
+      }
     }
     else {
       socket.emit('ERROR', { code: 'duplicatedGame', message: `There is already a game called ${data.gameId}` });

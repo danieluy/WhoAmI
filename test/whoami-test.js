@@ -1,100 +1,129 @@
 const assert = require('chai').assert;
 const expect = require('chai').expect;
-
-describe('Object', function(){
-  it.only('????????????', function(){
-    const Game = require('../my_modules/game.js');
-    const Player = require('../my_modules/player.js');
-    console.log(Game.player.players);
-    let p = Object.create(Player);
-    p.id = 'someId'
-    Game.player.add(p);
-    console.log(Game.player.players);
-
-    let g = Object.create(Game);
-    let p1 = Object.create(Player);
-    p1.id = 'someOtherId'
-    g.player.add(p1)
-
-    console.log(Game.player.players);
-  })
-})
+const Game = require('../my_modules/game.js');
+const Player = require('../my_modules/player.js');
+const Character = require('../my_modules/character.js');
+const SocketStub = require('./mock_files/socket.js');
 
 describe('Player', function () {
-  let Player;
 
-  before(function () {
-    Player = require('../my_modules/player.js');
-  });
-
-  it('should instantiate a Player', function () {
-    const p = Object.create(Player);
+  it('Instantiate a Player', function () {
+    const p = Player.create();
     assert.isTrue(Player.isPrototypeOf(p));
   });
 
 });
 
-describe('Game', function () {
-  let Game;
-  let Player;
+describe('Character', function () {
 
-  before(function () {
-    Game = require('../my_modules/game.js');
-    Player = require('../my_modules/player.js');
-  });
-
-  it('Instantiate a Game', function () {
-    const g = Object.create(Game);
-    assert.isTrue(Game.isPrototypeOf(g));
-  });
-
-  it('Add and retrieve a Game', function () {
-    const games = {};
-    const g1 = Object.create(Game);
-    g1.id = 'someid';
-    games[g1.id] = g1;
-    const g2 = games.someid;
-    g1.someKey = 'some value';
-    assert.equal(g1.someKey, g2.someKey);
-  });
-
-  it('Add and retrieve a Player', function () {
-    const g = Object.create(Game);
-    const p1 = Object.create(Player);
-    p1.id = 'someId'
-    g.player.add(p1);
-    const p2 = g.player.get('someId');
-    p2.username = 'some name';
-    assert.equal(p1.username, p2.username);
-  });
-
-  it('Should throw "Player already exists"', function () {
-    const g = Object.create(Game);
-    const p1 = Object.create(Player);
-    const p2 = Object.create(Player);
-    p1.id = 'someId';
-    p2.id = 'someId';
-    g.player.add(p1);
-    try {
-      g.player.add(p2);
-    }
-    catch (error) {
-      assert.equal(error.message, "Player already exists");
-    }
+  it('Instantiate a Character', function () {
+    const c = Character.create();
+    assert.isTrue(Character.isPrototypeOf(c));
   });
 
 });
 
-describe('Character', function () {
-  let Character;
+describe('Game', function () {
 
-  before(function () {
-    Character = require('../my_modules/character.js');
+  let games = undefined;
+
+  beforeEach(function(){
+    games = {};
+  })
+
+  ///////////////////////////////  Game  ///////////////////////////////
+
+  it('Instantiate a Game', function () {
+    const g1 = Game.create();
+    const g2 = Game.create();
+    assert.isTrue(Game.isPrototypeOf(g1));
+    assert.isTrue(Game.isPrototypeOf(g2));
+    expect(g1).not.equal(g2)
+  });
+  it('Add and retrieve a Game', function () {
+    const g1 = Game.create('someid');
+    games['someid'] = g1;
+    g1.someKey1 = 'some value 1';
+    const g2 = games['someid'];
+    g2.someKey2 = 'some value 2';
+    assert.equal(g1.id, g2.id);
+    assert.equal(g1.someKey1, g2.someKey1);
+    assert.equal(g1.someKey2, g2.someKey2);
   });
 
-  it('should instantiate a Character', function () {
-    const c = Object.create(Character);
-    assert.isTrue(Character.isPrototypeOf(c));
+  ///////////////////////////////  Player  ///////////////////////////////
+
+  it('Add and retrieve a Player', function () {
+    const g = Game.create('game');
+    const p1 = Player.create('player');
+    g.player.add(p1);
+    expect(g.player.get('player')).equal(p1);
+    expect(g.player.players.hasOwnProperty('player')).be.true;
+  });
+  it('Delete a Player', function () {
+    const g = Game.create('game');
+    const p1 = Player.create('player');
+    g.player.add(p1);
+    g.player.remove('player');
+    expect(g.player.get('player')).be.undefined;
+    expect(g.player.players.hasOwnProperty('player')).be.false;
+  });
+  it('Prevent duplicate players', function () {
+    const g = Game.create('game');
+    const p1 = Player.create('player');
+    const p2 = Player.create('player');
+    g.player.add(p1);
+    expect( () => g.player.add(p2) ).to.throw("Player already exists");
+  });
+
+  ///////////////////////////////  Character  ///////////////////////////////
+
+  it('Add and retrieve a Character', function () {
+    const g = Game.create('game');
+    const c1 = Character.create('char');
+    g.character.add(c1);
+    expect(g.character.get('char')).equal(c1);
+    expect(g.character.characters.hasOwnProperty('char')).be.true;
+  });
+  it('Delete a Character', function () {
+    const g = Game.create('game');
+    const c1 = Character.create('char');
+    g.character.add(c1);
+    g.character.remove('char');
+    expect(g.character.get('char')).be.undefined;
+    expect(g.character.characters.hasOwnProperty('char')).be.false;
+  });
+  it('Prevent duplicate characters', function () {
+    const g = Game.create('game');
+    const c1 = Character.create('char');
+    const c2 = Character.create('char');
+    g.character.add(c1);
+    expect( () => g.character.add(c2) ).to.throw("Character already exists");
+  });
+
+  ///////////////////////////////  Socket  ///////////////////////////////
+
+  it('Add and retrieve a Socket', function () {
+    const g = Game.create('game');
+    const s1 = SocketStub.create('socket');
+    g.socket.add(s1);
+    expect(g.socket.get('socket')).equal(s1);
+    expect(g.socket.sockets.hasOwnProperty('socket')).be.true;
+  });
+  it('Delete a Socket', function () {
+    const g = Game.create('game');
+    const s1 = SocketStub.create('socket');
+    g.socket.add(s1);
+    g.socket.remove('socket');
+    expect(g.socket.get('socket')).be.undefined;
+    expect(g.socket.sockets.hasOwnProperty('socket')).be.false;
+  });
+  it('Prevent duplicate sockets', function () {
+    const g = Game.create('game');
+    const s1 = SocketStub.create('socket');
+    const s2 = SocketStub.create('socket');
+    g.socket.add(s1);
+    expect( () => g.socket.add(s2) ).to.throw("Socket already exists");
   });
 
 });
