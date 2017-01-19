@@ -1,14 +1,24 @@
 "use strict";
 
 const Player = {
-  id: null,//number
-  username: null,
-  create: function (id, name) {
+  id: undefined,//number
+  name: undefined,
+  owner: undefined,
+  create: function (values) {
     const instance = Object.create(this);
-    if (id) instance.id = id;
-    if (name) instance.username = name;
+    if (values)
+      Object.keys(values).forEach(function (key) {
+        instance[key] = values[key];
+      })
     return instance;
   }
 }
+
+Object.defineProperty(Player, '__type__', {
+  enumerable: false,
+  configurable: false,
+  writable: false,
+  value: 'Player'
+});
 
 module.exports = Player;

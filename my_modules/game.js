@@ -2,19 +2,28 @@
 
 const Game = {
   id: undefined,
-  create: function (id) {
+  create: function (values) {
     const instance = Object.create(this);
-    instance.id = id;//string
+    if (values)
+      Object.keys(values).forEach(function (key) {
+        instance[key] = values[key];
+      })
     instance.player.players = {};
     instance.socket.sockets = {};
     instance.character.characters = {};
     return instance;
+  },
+  updateList: function () {
+    for (let key in this.player.players)
+      this.socket.sockets[key].emit('updateList', this.player.players);
   },
   player: {
     players: undefined,
     add: function (player) {
       if (this.players.hasOwnProperty(player.id))
         throw new Error('Player already exists');
+      else if (Object.keys(this.players).length && player.owner)
+        throw new Error('The game already has an owner');
       else
         this.players[player.id] = player;
     },
@@ -56,4 +65,12 @@ const Game = {
     }
   }
 }
+
+Object.defineProperty(Game, '__type__', {
+  enumerable: false,
+  configurable: false,
+  writable: false,
+  value: 'Game'
+});
+
 module.exports = Game;

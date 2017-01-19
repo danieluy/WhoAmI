@@ -1,0 +1,30 @@
+const Human = function(name){
+  this.name = name;
+  this.species = 'human';
+  this.belongings = {};
+  this.sayName = function(){
+    return `My name is ${this.name}`;
+  }
+  this.addBelonging = function(data){
+    this.belongings[data.name] = data;
+  }
+  this.sayBelongings = function(){
+    let to_say = 'I have this:'
+    for (var key in this.belongings) {
+      if (this.belongings.hasOwnProperty(key)) {
+        to_say += ` ${this.belongings[key].name},`;
+      }
+    }
+    return to_say.slice(0, -1);
+  }
+}
+
+const tayler = new Human('Tayler')
+const marla = new Human('Marla')
+tayler.addBelonging({name: 'table'})
+marla.addBelonging({name: 'table'})
+tayler.addBelonging({name: 'chair'})
+console.log(tayler.sayName())
+console.log(tayler.sayBelongings())
+console.log(marla.sayName())
+console.log(marla.sayBelongings())
