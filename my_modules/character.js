@@ -1,26 +1,10 @@
 "use strict";
 
-const Character = {
-  id: null,
-  description: null,
-  qa: [],
-  assignedTo: null,
-  inputBy: null,
-  create: function (values) {
-    const instance = Object.create(this);
-    if (values)
-      Object.keys(values).forEach(function (key) {
-        instance[key] = values[key];
-      })
-    return instance;
-  }
+const Character = function (values) {
+  this.id = values.id || undefined; // corresponds to the id of whoever input it
+  this.description = values.description || undefined;
+  this.qa = values.qa || [];
+  this.assignedTo = values.assignedTo || undefined;
 }
-
-Object.defineProperty(Character, '__type__', {
-  enumerable: false,
-  configurable: false,
-  writable: false,
-  value: 'Character'
-});
 
 module.exports = Character;

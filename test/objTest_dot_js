@@ -1,30 +1,57 @@
-const Human = function(name){
-  this.name = name;
-  this.species = 'human';
-  this.belongings = {};
-  this.sayName = function(){
-    return `My name is ${this.name}`;
-  }
-  this.addBelonging = function(data){
-    this.belongings[data.name] = data;
-  }
-  this.sayBelongings = function(){
-    let to_say = 'I have this:'
-    for (var key in this.belongings) {
-      if (this.belongings.hasOwnProperty(key)) {
-        to_say += ` ${this.belongings[key].name},`;
-      }
-    }
-    return to_say.slice(0, -1);
-  }
-}
+// const Human = function (name) {
+//   this.name = name;
+//   this.species = 'human';
+//   this.possessions = {};
+//   this.sayName = function () {
+//     return `My name is ${this.name}`;
+//   }
+//   this.addPossession = function (data) {
+//     this.possessions[data.name] = data;
+//   }
+//   this.sayPossessions = function () {
+//     if (!Object.keys(this.possessions).length)
+//       return 'I reject the basic assumptions of civilization, especially the importance of material possessions';
+//     let to_say = 'I have this:'
+//     for (var key in this.possessions)
+//       to_say += ` ${this.possessions[key].name},`;
+//     return to_say.slice(0, -1);
+//   }
+// }
 
-const tayler = new Human('Tayler')
-const marla = new Human('Marla')
-tayler.addBelonging({name: 'table'})
-marla.addBelonging({name: 'table'})
-tayler.addBelonging({name: 'chair'})
-console.log(tayler.sayName())
-console.log(tayler.sayBelongings())
-console.log(marla.sayName())
-console.log(marla.sayBelongings())
+// const tayler = new Human('Tayler')
+// const marla = new Human('Marla')
+// marla.addPossession({ name: 'cigarette' })
+// marla.addPossession({ name: 'stolen clothes' })
+// console.log(`${tayler.sayName()} and ${tayler.sayPossessions()}`) //My name is Tayler and I reject the basic assumptions of civilization, especially the importance of material possessions
+// console.log(`${marla.sayName()} and ${marla.sayPossessions()}`) //My name is Marla and I have this: cigarette, stolen clothes
+
+const Human = {
+  possessions: undefined,
+  sayName: function () {
+    return `My name is ${this.name}`;
+  },
+  addPossession: function (data) {
+    this.possessions[data.name] = data;
+  },
+  sayPossessions: function () {
+    if (!Object.keys(this.possessions).length)
+      return 'Reject the basic assumptions of civilization, especially the importance of material possessions';
+    let to_say = 'I have this:'
+    for (var key in this.possessions)
+      to_say += ` ${this.possessions[key].name},`;
+    return to_say.slice(0, -1);
+  },
+  create: function (name) {
+    const instance = Object.create(this);
+    instance.name = name;
+    instance.possessions = {};
+    return instance;
+  }
+};
+
+const tayler = Human.create('Tayler')
+const marla = Human.create('Marla')
+marla.addPossession({ name: 'cigarette' })
+marla.addPossession({ name: 'stolen clothes' })
+console.log(`${tayler.sayName()} and ${tayler.sayPossessions()}`) //My name is Tayler and I reject the basic assumptions of civilization, especially the 
+console.log(`${marla.sayName()} and ${marla.sayPossessions()}`) //My name is Marla and I have this: cigarette, stolen clothes

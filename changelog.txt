@@ -1,3 +1,8 @@
 v0.1.0
-    + 20170118 + Started TDD :)
-    + 20170112 + Started development
+    20170120 | TODO | Game.updateCharacters() testing
+    20170120 | BUG | Game.updateCharacters() is hiding the character from the one that inputs it instead of hiding  it from the one that has the character assigned to
+    20170120 | + | Basic game creation and joining functionality ready, working on the characters functionality
+    20170120 | + | Objects (classes) code updated and tested on classical object creation
+    20170120 | + | Changed to classical object creation
+    20170118 | + | Started TDD :)
+    20170112 | + | Started development
