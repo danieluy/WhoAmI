@@ -6,6 +6,59 @@ const Game = function (values) {
     for (let key in this.player.players)
       this.socket.sockets[key].emit('updatePlayers', this.player.players);
   };
+  // this.updateCharacters = function () { // Wrong!!! is hiding the character from the one that inputs it instead of hiding  it from the one that has the character assigned to  //
+  //   const redacted_characters = {};
+  //   for (let player_id in this.player.players) {
+  //     for (let character_id in this.character.characters) {
+  //       const character = this.character.characters[character_id];
+  //       if (character_id === player_id)
+  //         character.description = '········';
+  //       redacted_characters[character_id] = character;
+  //     }
+  //     this.socket.sockets[player_id].emit('updateCharacters', redacted_characters);
+  //   }
+  // };
+  this.characterPerPlayer = function () { // NEEDS TESTING
+    for (var key in this.player.players) {
+      if (!this.character.characters.hasOwnProperty(key))
+        return false;
+    }
+    return true;
+  };
+  this.assignCharacters = function () { // NEEDS TESTING
+    const assing_characters = {};
+    const character_ids = Object.keys(this.character.characters);
+    for (let key in this.player.players) {
+      const p = this.player.players[key];
+      let assigned = false;
+      while (!assigned) {
+        const character_id = character_ids[Math.floor(Math.random() * character_ids.length)];
+        if (!this.assing_characters.hasOwnProperty(character_id) && p.id !== character_id) {
+          p.character = this.character.characters[character_id];
+          assigned = true;
+        }
+      }
+    }
+  };
+  this.startGame = function (player) { // NEEDS TESTING
+    if (Object.keys(this.character.characters).length > 1) {
+      if (player && player.owner) {
+        if (this.characterPerPlayer()) {
+          this.started = true; {
+
+          }
+          this.assignCharacters();
+          this.updatePlayers();
+        }
+        else
+          throw new Error('Some player have not input a Character yet');
+      }
+      else
+        throw new Error('A game can only be started by its owner');
+    }
+    else
+      throw new Error('Not enough players, the required minimum is two');
+  };
   this.player = {
     players: {},
     add: function (player) {
@@ -36,18 +89,6 @@ const Game = function (values) {
     },
     remove: function (socket_id) {
       delete this.sockets[socket_id];
-    }
-  };
-  this.updateCharacters = function () { // Wrong!!! is hiding the character from the one that inputs it instead of hiding  it from the one that has the character assigned to  //
-    const redacted_characters = {};
-    for (let player_id in this.player.players) {
-      for (let character_id in this.character.characters) {
-        const character = this.character.characters[character_id];
-        if (character_id === player_id)
-          character.description = '········';
-        redacted_characters[character_id] = character;
-      }
-      this.socket.sockets[player_id].emit('updateCharacters', redacted_characters);
     }
   };
   this.character = {

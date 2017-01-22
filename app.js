@@ -79,10 +79,26 @@ io.on('connection', function (socket) {
       try {
         g.character.add(c);
         socket.emit('inputCharacterDone');
-        g.updateCharacters();
+        socket.emit('TEST', g.character.characters)
       }
       catch (err) {
         socket.emit('ERROR', { code: 'duplicatedCharacter', message: `Duplicated character id: ${data.username}` });
+      }
+    }
+    else {
+      socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
+    }
+  })
+
+  socket.on('startGame', function (data) {
+    if (games.hasOwnProperty(data.gameId)) {
+      const g = games[data.gameId];
+      const p = g.player.get(socket.id)
+      try {
+        g.startGame(p);
+      }
+      catch (err) {
+        socket.emit('ERROR', { code: 'notTheOwner', message: `The game can only be started by its owner` });
       }
     }
     else {

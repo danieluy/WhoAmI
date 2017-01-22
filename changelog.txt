@@ -1,6 +1,13 @@
 v0.1.0
-    20170120 | TODO | Game.updateCharacters() testing
-    20170120 | BUG | Game.updateCharacters() is hiding the character from the one that inputs it instead of hiding  it from the one that has the character assigned to
+    20170121 | TODO | Game.updatePlayers() has to hide the character from the player that has it assigned to, or another method has to do it
+    20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
+    20170121 | TODO | Test Game.assignCharacters()
+    20170121 | TODO | Test Game.startGame()
+    20170121 | TODO | Test Game.characterPerPlayer()
+    20170121 | - | Removed Game.updateCharacters()
+    20170121 | + | Added Game.assignCharacters()
+    20170121 | + | Added Game.startGame()
+    20170121 | + | Added Game.characterPerPlayer()
     20170120 | + | Basic game creation and joining functionality ready, working on the characters functionality
     20170120 | + | Objects (classes) code updated and tested on classical object creation
     20170120 | + | Changed to classical object creation
