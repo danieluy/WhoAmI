@@ -1,9 +1,9 @@
 v0.1.0
     20170121 | TODO | Game.updatePlayers() has to hide the character from the player that has it assigned to, or another method has to do it
     20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
-    20170121 | TODO | Test Game.assignCharacters()
-    20170121 | TODO | Test Game.startGame()
     20170121 | TODO | Test Game.characterPerPlayer()
+    20170123 | + | Added test for Game.assignCharacters()
+    20170123 | + | Added test for Game.characterPerPlayer()
     20170121 | - | Removed Game.updateCharacters()
     20170121 | + | Added Game.assignCharacters()
     20170121 | + | Added Game.startGame()

@@ -33,7 +33,7 @@ const Game = function (values) {
       let assigned = false;
       while (!assigned) {
         const character_id = character_ids[Math.floor(Math.random() * character_ids.length)];
-        if (!this.assing_characters.hasOwnProperty(character_id) && p.id !== character_id) {
+        if (!assing_characters.hasOwnProperty(character_id) && p.id !== character_id) {
           p.character = this.character.characters[character_id];
           assigned = true;
         }
@@ -44,9 +44,7 @@ const Game = function (values) {
     if (Object.keys(this.character.characters).length > 1) {
       if (player && player.owner) {
         if (this.characterPerPlayer()) {
-          this.started = true; {
-
-          }
+          this.started = true;
           this.assignCharacters();
           this.updatePlayers();
         }
