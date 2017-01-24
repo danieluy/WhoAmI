@@ -31,6 +31,22 @@ const games = {};
 
 io.on('connection', function (socket) {
 
+  socket.on('startGame', function (data) {
+    if (games.hasOwnProperty(data.gameId)) {
+      const g = games[data.gameId];
+      const p = g.player.get(socket.id);
+      try {
+        g.startGame(p);
+        socket.emit('gameStarted');
+      } catch (err) {
+        socket.emit('ERROR', { code: 'unableToStart', message: err.message });
+      }
+    }
+    else {
+      socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
+    }
+  })
+
   socket.on('createGame', function (data) {
     if (!games.hasOwnProperty(data.gameId)) {
       const g = new Game({ id: data.gameId });
@@ -79,7 +95,7 @@ io.on('connection', function (socket) {
       try {
         g.character.add(c);
         socket.emit('inputCharacterDone');
-        socket.emit('TEST', g.character.characters)
+        io.emit('TEST', g.character.characters)
       }
       catch (err) {
         socket.emit('ERROR', { code: 'duplicatedCharacter', message: `Duplicated character id: ${data.username}` });

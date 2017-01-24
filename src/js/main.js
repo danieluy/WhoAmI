@@ -25,6 +25,7 @@ var $main = {
       this.socket.on('updatePlayers', this.render.updatePlayers.bind(this));
       this.socket.on('updateCharacters', this.render.updateCharacters.bind(this));
       this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
+      this.socket.on('gameStarted', this.gameStarted.bind(this));
     }
   },
 
@@ -41,6 +42,7 @@ var $main = {
     this.character_name = document.getElementById('character-name');
     this.player_name = document.getElementById('player-name');
     this.players_wrapper = document.getElementById('players-wrapper');
+    this.start_game_button = document.getElementById('start-game-button');
     this.domListeners();
   },
 
@@ -48,6 +50,17 @@ var $main = {
     this.new_game_button.addEventListener('click', this.createGame.bind(this));
     this.join_game_button.addEventListener('click', this.joinGame.bind(this));
     this.input_character_button.addEventListener('click', this.inputCharacter.bind(this));
+    this.start_game_button.addEventListener('click', this.startGame.bind(this));
+  },
+
+  startGame: function () {
+    this.socket.emit('startGame', {
+      gameId: this.gameData.gameId
+    })
+  },
+
+  gameStarted: function(){
+    this.render.alertOk('Game started!!!')
   },
 
   createGame: function (e) {
@@ -103,7 +116,7 @@ var $main = {
         }
       }
     },
-    updateCharacters: function(characters){
+    updateCharacters: function (characters) {
       console.log(characters)
     }
   },
@@ -127,6 +140,9 @@ var $main = {
     if (err.code === 'duplicatedCharacter') {
       this.render.alertError(err.message);
       this.input_character_button.disabled = false;
+    }
+    if (err.code === 'unableToStart') {
+      this.render.alertError(err.message);
     }
   }
 

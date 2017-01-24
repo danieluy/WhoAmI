@@ -1,1 +1,549 @@
-!function(e){function t(a){if(n[a])return n[a].exports;var r=n[a]={exports:{},id:a,loaded:!1};return e[a].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){n(1),document.addEventListener("DOMContentLoaded",function(e){a.init()});var a={gameData:{username:void 0,gameId:void 0,playersList:[]},init:function(){this.socket=io(),this.domCache(),this.socket&&(this.socket.on("ERROR",this.errorHandler.bind(this)),this.socket.on("TEST",this.logTest.bind(this)),this.socket.on("updatePlayers",this.render.updatePlayers.bind(this)),this.socket.on("updateCharacters",this.render.updateCharacters.bind(this)),this.socket.on("inputCharacterDone",this.inputCharacterDone.bind(this)))},logTest:function(e){console.log("<<< TEST >>>"),console.log(e)},domCache:function(){this.new_game_button=document.getElementById("new-game-button"),this.join_game_button=document.getElementById("join-game-button"),this.input_character_button=document.getElementById("input-character-button"),this.game_id=document.getElementById("game-name"),this.character_name=document.getElementById("character-name"),this.player_name=document.getElementById("player-name"),this.players_wrapper=document.getElementById("players-wrapper"),this.domListeners()},domListeners:function(){this.new_game_button.addEventListener("click",this.createGame.bind(this)),this.join_game_button.addEventListener("click",this.joinGame.bind(this)),this.input_character_button.addEventListener("click",this.inputCharacter.bind(this))},createGame:function(e){this.gameData.username=this.player_name.value,this.gameData.gameId=this.game_id.value,this.join_game_button.disabled=!0,this.new_game_button.disabled=!0,this.socket.emit("createGame",{gameId:this.gameData.gameId,username:this.gameData.username})},joinGame:function(){this.gameData.username=this.player_name.value,this.gameData.gameId=this.game_id.value,this.join_game_button.disabled=!0,this.new_game_button.disabled=!0,this.socket.emit("joinGame",{gameId:this.gameData.gameId,username:this.gameData.username})},inputCharacter:function(){this.socket.emit("inputCharacter",{gameId:this.gameData.gameId,character:this.character_name.value})},inputCharacterDone:function(){this.input_character_button.disabled=!0},render:{alertOk:function(e){console.log(e),alert(e)},alertError:function(e){console.error(e),alert(e)},updatePlayers:function(e){this.gameData.playersList=e,this.players_wrapper.innerHTML="";for(var t in e)if(e.hasOwnProperty(t)){var n=document.createElement("pre");n.innerHTML=JSON.stringify(e[t],null,2),this.players_wrapper.appendChild(n)}},updateCharacters:function(e){console.log(e)}},errorHandler:function(e){"duplicatedGame"===e.code&&(this.render.alertError(e.message),this.gameData.username=void 0,this.gameData.gameId=void 0,this.join_game_button.disabled=!1,this.new_game_button.disabled=!1),"noGame"===e.code&&(this.render.alertError(e.message),this.gameData.username=void 0,this.gameData.gameId=void 0,this.join_game_button.disabled=!1,this.new_game_button.disabled=!1,this.input_character_button.disabled=!1),"duplicatedCharacter"===e.code&&(this.render.alertError(e.message),this.input_character_button.disabled=!1)}};e.exports=a},function(e,t,n){var a=n(2);"string"==typeof a&&(a=[[e.id,a,""]]);n(4)(a,{});a.locals&&(e.exports=a.locals)},function(e,t,n){t=e.exports=n(3)(),t.push([e.id,"*,html{margin:0;padding:0;box-sizing:border-box;font-family:Roboto,FreeSans,Helvetica,Arial,sans-serif}*,body,html{color:#333;font-size:16px}body{font-family:Roboto,sans-serif}.users-wrapper{width:100%;display:flex;flex-direction:row}.user-card{width:25%}.user-name{display:block;font-size:2rem}",""])},function(e,t){e.exports=function(){var e=[];return e.toString=function(){for(var e=[],t=0;t<this.length;t++){var n=this[t];n[2]?e.push("@media "+n[2]+"{"+n[1]+"}"):e.push(n[1])}return e.join("")},e.i=function(t,n){"string"==typeof t&&(t=[[null,t,""]]);for(var a={},r=0;r<this.length;r++){var i=this[r][0];"number"==typeof i&&(a[i]=!0)}for(r=0;r<t.length;r++){var s=t[r];"number"==typeof s[0]&&a[s[0]]||(n&&!s[2]?s[2]=n:n&&(s[2]="("+s[2]+") and ("+n+")"),e.push(s))}},e}},function(e,t,n){function a(e,t){for(var n=0;n<e.length;n++){var a=e[n],r=m[a.id];if(r){r.refs++;for(var i=0;i<r.parts.length;i++)r.parts[i](a.parts[i]);for(;i<a.parts.length;i++)r.parts.push(u(a.parts[i],t))}else{for(var s=[],i=0;i<a.parts.length;i++)s.push(u(a.parts[i],t));m[a.id]={id:a.id,refs:1,parts:s}}}}function r(e){for(var t=[],n={},a=0;a<e.length;a++){var r=e[a],i=r[0],s=r[1],o=r[2],d=r[3],u={css:s,media:o,sourceMap:d};n[i]?n[i].parts.push(u):t.push(n[i]={id:i,parts:[u]})}return t}function i(e,t){var n=g(),a=y[y.length-1];if("top"===e.insertAt)a?a.nextSibling?n.insertBefore(t,a.nextSibling):n.appendChild(t):n.insertBefore(t,n.firstChild),y.push(t);else{if("bottom"!==e.insertAt)throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");n.appendChild(t)}}function s(e){e.parentNode.removeChild(e);var t=y.indexOf(e);t>=0&&y.splice(t,1)}function o(e){var t=document.createElement("style");return t.type="text/css",i(e,t),t}function d(e){var t=document.createElement("link");return t.rel="stylesheet",i(e,t),t}function u(e,t){var n,a,r;if(t.singleton){var i=v++;n=b||(b=o(t)),a=c.bind(null,n,i,!1),r=c.bind(null,n,i,!0)}else e.sourceMap&&"function"==typeof URL&&"function"==typeof URL.createObjectURL&&"function"==typeof URL.revokeObjectURL&&"function"==typeof Blob&&"function"==typeof btoa?(n=d(t),a=h.bind(null,n),r=function(){s(n),n.href&&URL.revokeObjectURL(n.href)}):(n=o(t),a=l.bind(null,n),r=function(){s(n)});return a(e),function(t){if(t){if(t.css===e.css&&t.media===e.media&&t.sourceMap===e.sourceMap)return;a(e=t)}else r()}}function c(e,t,n,a){var r=n?"":a.css;if(e.styleSheet)e.styleSheet.cssText=_(t,r);else{var i=document.createTextNode(r),s=e.childNodes;s[t]&&e.removeChild(s[t]),s.length?e.insertBefore(i,s[t]):e.appendChild(i)}}function l(e,t){var n=t.css,a=t.media;if(a&&e.setAttribute("media",a),e.styleSheet)e.styleSheet.cssText=n;else{for(;e.firstChild;)e.removeChild(e.firstChild);e.appendChild(document.createTextNode(n))}}function h(e,t){var n=t.css,a=t.sourceMap;a&&(n+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(a))))+" */");var r=new Blob([n],{type:"text/css"}),i=e.href;e.href=URL.createObjectURL(r),i&&URL.revokeObjectURL(i)}var m={},p=function(e){var t;return function(){return"undefined"==typeof t&&(t=e.apply(this,arguments)),t}},f=p(function(){return/msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase())}),g=p(function(){return document.head||document.getElementsByTagName("head")[0]}),b=null,v=0,y=[];e.exports=function(e,t){t=t||{},"undefined"==typeof t.singleton&&(t.singleton=f()),"undefined"==typeof t.insertAt&&(t.insertAt="bottom");var n=r(e);return a(n,t),function(e){for(var i=[],s=0;s<n.length;s++){var o=n[s],d=m[o.id];d.refs--,i.push(d)}if(e){var u=r(e);a(u,t)}for(var s=0;s<i.length;s++){var d=i[s];if(0===d.refs){for(var c=0;c<d.parts.length;c++)d.parts[c]();delete m[d.id]}}}};var _=function(){var e=[];return function(t,n){return e[t]=n,e.filter(Boolean).join("\n")}}()}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(1);
+
+	// window.addEventListener("beforeunload", function (e) {
+	//   e.returnValue = "";
+	//   return confirmationMessage;
+	// });
+
+	document.addEventListener("DOMContentLoaded", function (event) {
+	  $main.init();
+	});
+
+	var $main = {
+	  gameData: {
+	    username: undefined,
+	    gameId: undefined,
+	    playersList: []
+	  },
+
+	  init: function () {
+	    this.socket = io();
+	    this.domCache();
+	    if (this.socket) {
+	      this.socket.on('ERROR', this.errorHandler.bind(this));
+	      this.socket.on('TEST', this.logTest.bind(this));
+	      this.socket.on('updatePlayers', this.render.updatePlayers.bind(this));
+	      this.socket.on('updateCharacters', this.render.updateCharacters.bind(this));
+	      this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
+	      this.socket.on('gameStarted', this.gameStarted.bind(this));
+	    }
+	  },
+
+	  logTest: function (data) {
+	    console.log('<<< TEST >>>')
+	    console.log(data)
+	  },
+
+	  domCache: function () {
+	    this.new_game_button = document.getElementById('new-game-button');
+	    this.join_game_button = document.getElementById('join-game-button');
+	    this.input_character_button = document.getElementById('input-character-button');
+	    this.game_id = document.getElementById('game-name');
+	    this.character_name = document.getElementById('character-name');
+	    this.player_name = document.getElementById('player-name');
+	    this.players_wrapper = document.getElementById('players-wrapper');
+	    this.start_game_button = document.getElementById('start-game-button');
+	    this.domListeners();
+	  },
+
+	  domListeners: function () {
+	    this.new_game_button.addEventListener('click', this.createGame.bind(this));
+	    this.join_game_button.addEventListener('click', this.joinGame.bind(this));
+	    this.input_character_button.addEventListener('click', this.inputCharacter.bind(this));
+	    this.start_game_button.addEventListener('click', this.startGame.bind(this));
+	  },
+
+	  startGame: function () {
+	    this.socket.emit('startGame', {
+	      gameId: this.gameData.gameId
+	    })
+	  },
+
+	  gameStarted: function(){
+	    this.render.alertOk('Game started!!!')
+	  },
+
+	  createGame: function (e) {
+	    this.gameData.username = this.player_name.value;
+	    this.gameData.gameId = this.game_id.value;
+	    this.join_game_button.disabled = true;
+	    this.new_game_button.disabled = true;
+	    this.socket.emit('createGame', {
+	      gameId: this.gameData.gameId,
+	      username: this.gameData.username
+	    })
+	  },
+
+	  joinGame: function () {
+	    this.gameData.username = this.player_name.value;
+	    this.gameData.gameId = this.game_id.value;
+	    this.join_game_button.disabled = true;
+	    this.new_game_button.disabled = true;
+	    this.socket.emit('joinGame', {
+	      gameId: this.gameData.gameId,
+	      username: this.gameData.username
+	    })
+	  },
+
+	  inputCharacter: function () {
+	    this.socket.emit('inputCharacter', {
+	      gameId: this.gameData.gameId,
+	      character: this.character_name.value
+	    })
+	  },
+
+	  inputCharacterDone: function () {
+	    this.input_character_button.disabled = true;
+	  },
+
+	  render: {
+	    alertOk: function (message) {
+	      console.log(message);
+	      alert(message)
+	    },
+	    alertError: function (message) {
+	      console.error(message);
+	      alert(message)
+	    },
+	    updatePlayers: function (players) {
+	      this.gameData.playersList = players;
+	      this.players_wrapper.innerHTML = "";
+	      for (var key in players) {
+	        if (players.hasOwnProperty(key)) {
+	          var pre = document.createElement('pre');
+	          pre.innerHTML = JSON.stringify(players[key], null, 2);
+	          this.players_wrapper.appendChild(pre);
+	        }
+	      }
+	    },
+	    updateCharacters: function (characters) {
+	      console.log(characters)
+	    }
+	  },
+
+	  errorHandler: function (err) {
+	    if (err.code === 'duplicatedGame') {
+	      this.render.alertError(err.message);
+	      this.gameData.username = undefined;
+	      this.gameData.gameId = undefined;
+	      this.join_game_button.disabled = false;
+	      this.new_game_button.disabled = false;
+	    }
+	    if (err.code === 'noGame') {
+	      this.render.alertError(err.message);
+	      this.gameData.username = undefined;
+	      this.gameData.gameId = undefined;
+	      this.join_game_button.disabled = false;
+	      this.new_game_button.disabled = false;
+	      this.input_character_button.disabled = false;
+	    }
+	    if (err.code === 'duplicatedCharacter') {
+	      this.render.alertError(err.message);
+	      this.input_character_button.disabled = false;
+	    }
+	    if (err.code === 'unableToStart') {
+	      this.render.alertError(err.message);
+	    }
+	  }
+
+	}
+
+
+	module.exports = $main;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(2);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./main.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./main.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n   margin: 0px;\r\n   padding: 0px;\r\n   box-sizing: border-box;\r\n   font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\nbody{\r\n   font-family: Roboto, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\n/*--  Users  -----------------------------------------------------------------*/\r\n.users-wrapper{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}", ""]);
+
+	// exports
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ }
+/******/ ]);

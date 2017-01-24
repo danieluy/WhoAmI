@@ -1,7 +1,10 @@
-v0.1.0
-    20170121 | TODO | Game.updatePlayers() has to hide the character from the player that has it assigned to, or another method has to do it
+Who am I, Game Implementation
+
+Current
+    20170124 | BUG | Fail Emits an event for every Player in the Game
+    20170124 | BUG | Fail Event emitions are game dependent
+    20170124 | TODO | Test Game.updatePlayers()
     20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
-    20170121 | TODO | Test Game.characterPerPlayer()
     20170123 | + | Added test for Game.assignCharacters()
     20170123 | + | Added test for Game.characterPerPlayer()
     20170121 | - | Removed Game.updateCharacters()
@@ -12,4 +15,5 @@ v0.1.0
     20170120 | + | Objects (classes) code updated and tested on classical object creation
     20170120 | + | Changed to classical object creation
     20170118 | + | Started TDD :)
+v0.1.0
     20170112 | + | Started development

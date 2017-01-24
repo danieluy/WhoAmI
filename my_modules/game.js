@@ -1,12 +1,35 @@
 "use strict";
 
+const Player = require('./player.js');
+const Character = require('./character.js');
+
 const Game = function (values) {
   this.id = values.id || undefined;
   this.updatePlayers = function () {
-    for (let key in this.player.players)
-      this.socket.sockets[key].emit('updatePlayers', this.player.players);
+    for (let key1 in this.player.players) {
+      const redacted_players = {};
+      for (let key2 in this.player.players) {
+        const p = new Player({
+          id: this.player.players[key2].id,
+          name: this.player.players[key2].name,
+          owner: this.player.players[key2].owner
+        });
+        if (key1 !== key2)
+          p.character = this.player.players[key2].character;
+        else {
+          const c = new Character({
+            id: this.player.players[key2].character.id,
+            qa: this.player.players[key2].character.qa,
+            assignedTo: this.player.players[key2].character.assignedTo
+          })
+          p.character = c;
+        }
+        redacted_players[key2] = p;
+      }
+      this.socket.sockets[key1].emit('updatePlayers', redacted_players);
+    }
   };
-  // this.updateCharacters = function () { // Wrong!!! is hiding the character from the one that inputs it instead of hiding  it from the one that has the character assigned to  //
+  // this.updateCharacters = function () {
   //   const redacted_characters = {};
   //   for (let player_id in this.player.players) {
   //     for (let character_id in this.character.characters) {
@@ -18,14 +41,14 @@ const Game = function (values) {
   //     this.socket.sockets[player_id].emit('updateCharacters', redacted_characters);
   //   }
   // };
-  this.characterPerPlayer = function () { // NEEDS TESTING
+  this.characterPerPlayer = function () {
     for (var key in this.player.players) {
       if (!this.character.characters.hasOwnProperty(key))
         return false;
     }
     return true;
   };
-  this.assignCharacters = function () { // NEEDS TESTING
+  this.assignCharacters = function () {
     const assing_characters = {};
     const character_ids = Object.keys(this.character.characters);
     for (let key in this.player.players) {

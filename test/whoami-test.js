@@ -170,12 +170,10 @@ describe('Game', function () {
     g.player.add(p1);
     g.updatePlayers();
     expect(emitted.length).equal(1);
-    expect(JSON.stringify(emitted[0]).replace(' ', '')).equal('{"socket1":{"id":"socket1","name":"player1","owner":true}}');
     g.socket.add(s2);
     g.player.add(p2);
     g.updatePlayers();
     expect(emitted.length).equal(3);// total count of emitions
-    expect(emitted[0]).equal(emitted[1]);
   });
   it('Event emitions are game dependent', function () {
     const emitted = [];
@@ -238,7 +236,7 @@ describe('Game', function () {
     expect(p2.character).equal(c1);
   });
   it('Every Player gets assigned a Character diferent from the input one', function () {
-    const iter = 1000;
+    const iter = 500;
     const g = new Game({ id: 'game1' });
     const p1 = new Player({ id: `player1`, name: `player1`, owner: true });
     const c1 = new Character({ id: `player1`, description: `character input by player1` });
@@ -258,5 +256,77 @@ describe('Game', function () {
       expect(g.player.players[`player${i}`].character).not.equal(g.character.characters[`player${i}`])
     }
   });
+  it('Game.startGame()', function () {
+    const emitted = [];
+    const iter = 10;
+    const g = new Game({ id: 'game1' });
+    const s1 = new SocketStub({ id: 'player1' });
+    s1.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
+    const p1 = new Player({ id: `player1`, name: `player1`, owner: true });
+    const c1 = new Character({ id: `player1`, description: `character input by player1` });
+    g.socket.add(s1);
+    g.player.add(p1);
+    g.character.add(c1);
+    expect(() => g.startGame(p1)).throw('Not enough players, the required minimum is two')
+    for (let i = 2; i <= iter; i++) {
+      const s = new SocketStub({ id: `player${i}` });
+      s.on('updatePlayers', function (data) {
+        emitted.push(data)
+      })
+      const p = new Player({ id: `player${i}`, name: `player${i}` });
+      const c = new Character({ id: `player${i}`, description: `character input by player${i}` });
+      g.socket.add(s);
+      g.player.add(p);
+      g.character.add(c);
+    }
+    const s11 = new SocketStub({ id: 'player11' });
+    s11.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
+    const p11 = new Player({ id: `player11`, name: `player11` });
+    g.player.add(p11);
+    g.socket.add(s11);
+    expect(() => g.startGame(g.player.get('player2'))).throw('A game can only be started by its owner');
+    expect(() => g.startGame(p1)).throw('Some player have not input a Character yet');
+    const c11 = new Character({ id: `player11`, description: `character input by player11` });
+    g.character.add(c11);
+    expect(g.started).not.be.true;
+    g.startGame(p1);
+    expect(g.started).be.true;
+    expect(emitted.length).equal(11)
+  });
+  it('Emmit a players list with assigned characters after game start', function () {
+    const emitted = [];
+    const g = new Game({ id: 'game1' });
+    const s1 = new SocketStub({ id: 'player1' });
+    const s2 = new SocketStub({ id: 'player2' });
+    s1.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
+    s2.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
+    const p1 = new Player({ id: `player1`, name: `player1`, owner: true });
+    const p2 = new Player({ id: `player2`, name: `player2` });
+    const c1 = new Character({ id: `player1`, description: `character input by player1` });
+    const c2 = new Character({ id: `player2`, description: `character input by player2` });
+    g.socket.add(s1);
+    g.socket.add(s2);
+    g.player.add(p1);
+    g.player.add(p2);
+    g.character.add(c1);
+    g.character.add(c2);
+    expect(g.player.get('player1').character).be.undefined;
+    expect(g.player.get('player2').character).be.undefined;
+    g.startGame(p1);
+    expect(Character.prototype.isPrototypeOf(g.player.get('player1').character)).be.true;
+    expect(Character.prototype.isPrototypeOf(g.player.get('player2').character)).be.true;
+    expect(emitted[0]['player1'].character.description).be.undefined;
+    expect(emitted[0]['player2'].character.description).not.be.undefined;
+    expect(emitted[1]['player1'].character.description).not.be.undefined;
+    expect(emitted[1]['player2'].character.description).be.undefined;
+  })
 
 });
