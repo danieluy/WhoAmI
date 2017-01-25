@@ -13,6 +13,7 @@ var $main = {
   gameData: {
     username: undefined,
     gameId: undefined,
+    player: undefined,
     playersList: []
   },
 
@@ -26,6 +27,8 @@ var $main = {
       this.socket.on('updateCharacters', this.render.updateCharacters.bind(this));
       this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
       this.socket.on('gameStarted', this.gameStarted.bind(this));
+      this.socket.on('gameCreated', this.gameCreatedJoined.bind(this));
+      this.socket.on('gameJoined', this.gameCreatedJoined.bind(this));
     }
   },
 
@@ -35,6 +38,10 @@ var $main = {
   },
 
   domCache: function () {
+    this.start_wrapper = document.getElementsByClassName('start-wrapper')[0];
+    this.select_character_wrapper = document.getElementsByClassName('select-character-wrapper')[0];
+    this.start_game_wrapper_owner = document.getElementsByClassName('start-game-wrapper-owner')[0];
+    this.start_game_wrapper_not_owner = document.getElementsByClassName('start-game-wrapper-not-owner')[0];
     this.new_game_button = document.getElementById('new-game-button');
     this.join_game_button = document.getElementById('join-game-button');
     this.input_character_button = document.getElementById('input-character-button');
@@ -59,30 +66,33 @@ var $main = {
     })
   },
 
-  gameStarted: function(){
+  gameStarted: function () {
+    console.log('lalala')
     this.render.alertOk('Game started!!!')
   },
 
   createGame: function (e) {
     this.gameData.username = this.player_name.value;
     this.gameData.gameId = this.game_id.value;
-    this.join_game_button.disabled = true;
-    this.new_game_button.disabled = true;
     this.socket.emit('createGame', {
       gameId: this.gameData.gameId,
       username: this.gameData.username
-    })
+    });
+  },
+
+  gameCreatedJoined: function (data) {
+    this.gameData.player = data.player;
+    this.start_wrapper.classList.add('hidden');
+    this.select_character_wrapper.classList.remove('hidden');
   },
 
   joinGame: function () {
     this.gameData.username = this.player_name.value;
     this.gameData.gameId = this.game_id.value;
-    this.join_game_button.disabled = true;
-    this.new_game_button.disabled = true;
     this.socket.emit('joinGame', {
       gameId: this.gameData.gameId,
       username: this.gameData.username
-    })
+    });
   },
 
   inputCharacter: function () {
@@ -93,7 +103,11 @@ var $main = {
   },
 
   inputCharacterDone: function () {
-    this.input_character_button.disabled = true;
+    this.select_character_wrapper.classList.add('hidden');
+    if (this.gameData.player.owner)
+      this.start_game_wrapper_owner.classList.remove('hidden');
+    else
+      this.start_game_wrapper_not_owner.classList.remove('hidden');
   },
 
   render: {
@@ -126,20 +140,14 @@ var $main = {
       this.render.alertError(err.message);
       this.gameData.username = undefined;
       this.gameData.gameId = undefined;
-      this.join_game_button.disabled = false;
-      this.new_game_button.disabled = false;
     }
     if (err.code === 'noGame') {
       this.render.alertError(err.message);
       this.gameData.username = undefined;
       this.gameData.gameId = undefined;
-      this.join_game_button.disabled = false;
-      this.new_game_button.disabled = false;
-      this.input_character_button.disabled = false;
     }
     if (err.code === 'duplicatedCharacter') {
       this.render.alertError(err.message);
-      this.input_character_button.disabled = false;
     }
     if (err.code === 'unableToStart') {
       this.render.alertError(err.message);

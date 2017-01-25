@@ -1,10 +1,10 @@
-Who am I, Game Implementation
-
-Current
-    20170124 | BUG | Fail Emits an event for every Player in the Game
-    20170124 | BUG | Fail Event emitions are game dependent
+v0.2.0
     20170124 | TODO | Test Game.updatePlayers()
     20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
+    20170125 | + | Started the UX design
+    20170125 | + | Added response events to handle successful actions
+    20170125 | - | Remove the button's disabling at event send, and button's re-enabling on error handling
+    20170125 | + | Modified Game.updatePlayers() behavior according to whether the game has started or not
     20170123 | + | Added test for Game.assignCharacters()
     20170123 | + | Added test for Game.characterPerPlayer()
     20170121 | - | Removed Game.updateCharacters()

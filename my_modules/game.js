@@ -5,42 +5,47 @@ const Character = require('./character.js');
 
 const Game = function (values) {
   this.id = values.id || undefined;
+  this.started = false;
   this.updatePlayers = function () {
-    for (let key1 in this.player.players) {
-      const redacted_players = {};
-      for (let key2 in this.player.players) {
-        const p = new Player({
-          id: this.player.players[key2].id,
-          name: this.player.players[key2].name,
-          owner: this.player.players[key2].owner
-        });
-        if (key1 !== key2)
-          p.character = this.player.players[key2].character;
-        else {
-          const c = new Character({
-            id: this.player.players[key2].character.id,
-            qa: this.player.players[key2].character.qa,
-            assignedTo: this.player.players[key2].character.assignedTo
-          })
-          p.character = c;
+    if (this.started) {
+      for (let key1 in this.player.players) {
+        const redacted_players = {};
+        for (let key2 in this.player.players) {
+          const p = new Player({
+            id: this.player.players[key2].id,
+            name: this.player.players[key2].name,
+            owner: this.player.players[key2].owner
+          });
+          if (key1 !== key2)
+            p.character = this.player.players[key2].character;
+          else {
+            const c = new Character({
+              id: this.player.players[key2].character.id,
+              qa: this.player.players[key2].character.qa,
+              assignedTo: this.player.players[key2].character.assignedTo
+            })
+            p.character = c;
+          }
+          redacted_players[key2] = p;
         }
-        redacted_players[key2] = p;
+        this.socket.sockets[key1].emit('updatePlayers', redacted_players);
       }
-      this.socket.sockets[key1].emit('updatePlayers', redacted_players);
+    }
+    else {
+      const redacted_players = {};
+      for (let key in this.player.players) {
+        const p = new Player({
+          id: this.player.players[key].id,
+          name: this.player.players[key].name,
+          owner: this.player.players[key].owner
+        });
+        redacted_players[key] = p;
+      }
+      for (let key in this.player.players) {
+        this.socket.sockets[key].emit('updatePlayers', redacted_players);
+      }
     }
   };
-  // this.updateCharacters = function () {
-  //   const redacted_characters = {};
-  //   for (let player_id in this.player.players) {
-  //     for (let character_id in this.character.characters) {
-  //       const character = this.character.characters[character_id];
-  //       if (character_id === player_id)
-  //         character.description = '········';
-  //       redacted_characters[character_id] = character;
-  //     }
-  //     this.socket.sockets[player_id].emit('updateCharacters', redacted_characters);
-  //   }
-  // };
   this.characterPerPlayer = function () {
     for (var key in this.player.players) {
       if (!this.character.characters.hasOwnProperty(key))
@@ -48,28 +53,12 @@ const Game = function (values) {
     }
     return true;
   };
-  this.assignCharacters = function () {
-    const assing_characters = {};
-    const character_ids = Object.keys(this.character.characters);
-    for (let key in this.player.players) {
-      const p = this.player.players[key];
-      let assigned = false;
-      while (!assigned) {
-        const character_id = character_ids[Math.floor(Math.random() * character_ids.length)];
-        if (!assing_characters.hasOwnProperty(character_id) && p.id !== character_id) {
-          p.character = this.character.characters[character_id];
-          assigned = true;
-        }
-      }
-    }
-  };
   this.startGame = function (player) { // NEEDS TESTING
     if (Object.keys(this.character.characters).length > 1) {
       if (player && player.owner) {
         if (this.characterPerPlayer()) {
           this.started = true;
           this.assignCharacters();
-          this.updatePlayers();
         }
         else
           throw new Error('Some player have not input a Character yet');
@@ -79,6 +68,22 @@ const Game = function (values) {
     }
     else
       throw new Error('Not enough players, the required minimum is two');
+  };
+  this.assignCharacters = function () {
+    const assingned_characters = {};
+    const character_ids = Object.keys(this.character.characters);
+    for (let key in this.player.players) {
+      const p = this.player.players[key];
+      let assigned = false;
+      while (!assigned) {
+        const character_id = character_ids[Math.floor(Math.random() * character_ids.length)];
+        if (!assingned_characters.hasOwnProperty(character_id) && p.id !== character_id) {
+          p.character = this.character.characters[character_id];
+          assigned = true;
+        }
+      }
+    };
+    this.updatePlayers();
   };
   this.player = {
     players: {},

@@ -1,22 +1,59 @@
 /*--  Reset  -----------------------------------------------------------------*/
 *, html{
-   margin: 0px;
-   padding: 0px;
-   box-sizing: border-box;
-   font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;
-   color: #333;
-   font-size: 16px;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, .6);
+  font-size: 16px;
 }
 body{
-   font-family: Roboto, sans-serif;
-   color: #333;
-   font-size: 16px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;
+  color: #333;
+  font-size: 16px;
+  background-color: #8cc;
+  border: 20px solid rgba(255, 255, 255, .6);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .25);
 }
-/*--  Users  -----------------------------------------------------------------*/
-.users-wrapper{
+h1{
+  font-size: 3rem;
+  font-weight: 900;
+  text-align: center;
+  line-height: 90px;
+}
+h2{
+  font-size: 2rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 60px;
+}
+.start-wrapper,
+.select-character-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  /*background-color: rgba(255, 255, 255, .6);*/
+  width: 50%;
+  min-height: 300px;
+  border: 10px solid rgba(255, 255, 255, .6);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);
+  background-color: #8dd;
+}
+.start-wrapper-section{
   width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.users-wrapper{
+  width: 50%;
 }
 .user-card{
   width: 25%;
@@ -24,4 +61,46 @@ body{
 .user-name{
   display: block;
   font-size: 2rem;
+}
+input{
+  background-color: transparent;
+  border-style: none;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 20px;
+  text-align: center;
+}
+button{
+  background-color: transparent;
+  /*border: 5px solid #fff;*/
+  border-style: none;
+  color: rgba(255, 255, 255, .5);
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 20px;
+  transition: color 300ms ease-out;
+}
+button:hover{
+  color: #fff;
+}
+.hidden{
+  display: none;
+}
+/*--  Placeholders  -----------------------------------------------------------------*/
+::-webkit-input-placeholder {
+  color: rgba(0, 0, 0, .25);
+  font-weight: 500;
+}
+:-moz-placeholder {
+  color: rgba(0, 0, 0, .25);
+  font-weight: 500;
+}
+::-moz-placeholder {
+  color: rgba(0, 0, 0, .25);
+  font-weight: 500;
+}
+:-ms-input-placeholder {
+  color: rgba(0, 0, 0, .25);
+  font-weight: 500;
 }

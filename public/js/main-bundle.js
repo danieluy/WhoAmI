@@ -59,6 +59,7 @@
 	  gameData: {
 	    username: undefined,
 	    gameId: undefined,
+	    player: undefined,
 	    playersList: []
 	  },
 
@@ -72,6 +73,8 @@
 	      this.socket.on('updateCharacters', this.render.updateCharacters.bind(this));
 	      this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
 	      this.socket.on('gameStarted', this.gameStarted.bind(this));
+	      this.socket.on('gameCreated', this.gameCreatedJoined.bind(this));
+	      this.socket.on('gameJoined', this.gameCreatedJoined.bind(this));
 	    }
 	  },
 
@@ -81,6 +84,10 @@
 	  },
 
 	  domCache: function () {
+	    this.start_wrapper = document.getElementsByClassName('start-wrapper')[0];
+	    this.select_character_wrapper = document.getElementsByClassName('select-character-wrapper')[0];
+	    this.start_game_wrapper_owner = document.getElementsByClassName('start-game-wrapper-owner')[0];
+	    this.start_game_wrapper_not_owner = document.getElementsByClassName('start-game-wrapper-not-owner')[0];
 	    this.new_game_button = document.getElementById('new-game-button');
 	    this.join_game_button = document.getElementById('join-game-button');
 	    this.input_character_button = document.getElementById('input-character-button');
@@ -105,30 +112,33 @@
 	    })
 	  },
 
-	  gameStarted: function(){
+	  gameStarted: function () {
+	    console.log('lalala')
 	    this.render.alertOk('Game started!!!')
 	  },
 
 	  createGame: function (e) {
 	    this.gameData.username = this.player_name.value;
 	    this.gameData.gameId = this.game_id.value;
-	    this.join_game_button.disabled = true;
-	    this.new_game_button.disabled = true;
 	    this.socket.emit('createGame', {
 	      gameId: this.gameData.gameId,
 	      username: this.gameData.username
-	    })
+	    });
+	  },
+
+	  gameCreatedJoined: function (data) {
+	    this.gameData.player = data.player;
+	    this.start_wrapper.classList.add('hidden');
+	    this.select_character_wrapper.classList.remove('hidden');
 	  },
 
 	  joinGame: function () {
 	    this.gameData.username = this.player_name.value;
 	    this.gameData.gameId = this.game_id.value;
-	    this.join_game_button.disabled = true;
-	    this.new_game_button.disabled = true;
 	    this.socket.emit('joinGame', {
 	      gameId: this.gameData.gameId,
 	      username: this.gameData.username
-	    })
+	    });
 	  },
 
 	  inputCharacter: function () {
@@ -139,7 +149,11 @@
 	  },
 
 	  inputCharacterDone: function () {
-	    this.input_character_button.disabled = true;
+	    this.select_character_wrapper.classList.add('hidden');
+	    if (this.gameData.player.owner)
+	      this.start_game_wrapper_owner.classList.remove('hidden');
+	    else
+	      this.start_game_wrapper_not_owner.classList.remove('hidden');
 	  },
 
 	  render: {
@@ -172,20 +186,14 @@
 	      this.render.alertError(err.message);
 	      this.gameData.username = undefined;
 	      this.gameData.gameId = undefined;
-	      this.join_game_button.disabled = false;
-	      this.new_game_button.disabled = false;
 	    }
 	    if (err.code === 'noGame') {
 	      this.render.alertError(err.message);
 	      this.gameData.username = undefined;
 	      this.gameData.gameId = undefined;
-	      this.join_game_button.disabled = false;
-	      this.new_game_button.disabled = false;
-	      this.input_character_button.disabled = false;
 	    }
 	    if (err.code === 'duplicatedCharacter') {
 	      this.render.alertError(err.message);
-	      this.input_character_button.disabled = false;
 	    }
 	    if (err.code === 'unableToStart') {
 	      this.render.alertError(err.message);
@@ -232,7 +240,7 @@
 
 
 	// module
-	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n   margin: 0px;\r\n   padding: 0px;\r\n   box-sizing: border-box;\r\n   font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\nbody{\r\n   font-family: Roboto, sans-serif;\r\n   color: #333;\r\n   font-size: 16px;\r\n}\r\n/*--  Users  -----------------------------------------------------------------*/\r\n.users-wrapper{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}", ""]);
+	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n  margin: 0px;\r\n  padding: 0px;\r\n  box-sizing: border-box;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: rgba(255, 255, 255, .6);\r\n  font-size: 16px;\r\n}\r\nbody{\r\n  height: 100vh;\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: #333;\r\n  font-size: 16px;\r\n  background-color: #8cc;\r\n  border: 20px solid rgba(255, 255, 255, .6);\r\n  box-shadow: inset 0 0 10px rgba(0, 0, 0, .25);\r\n}\r\nh1{\r\n  font-size: 3rem;\r\n  font-weight: 900;\r\n  text-align: center;\r\n  line-height: 90px;\r\n}\r\nh2{\r\n  font-size: 2rem;\r\n  font-weight: 500;\r\n  text-align: center;\r\n  line-height: 60px;\r\n}\r\n.start-wrapper,\r\n.select-character-wrapper{\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  /*background-color: rgba(255, 255, 255, .6);*/\r\n  width: 50%;\r\n  min-height: 300px;\r\n  border: 10px solid rgba(255, 255, 255, .6);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);\r\n  background-color: #8dd;\r\n}\r\n.start-wrapper-section{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n  justify-content: center;\r\n  align-items: center;\r\n}\r\n.users-wrapper{\r\n  width: 50%;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}\r\ninput{\r\n  background-color: transparent;\r\n  border-style: none;\r\n  color: #fff;\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  text-align: center;\r\n}\r\nbutton{\r\n  background-color: transparent;\r\n  /*border: 5px solid #fff;*/\r\n  border-style: none;\r\n  color: rgba(255, 255, 255, .5);\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  transition: color 300ms ease-out;\r\n}\r\nbutton:hover{\r\n  color: #fff;\r\n}\r\n.hidden{\r\n  display: none;\r\n}\r\n/*--  Placeholders  -----------------------------------------------------------------*/\r\n::-webkit-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n::-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-ms-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}", ""]);
 
 	// exports
 

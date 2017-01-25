@@ -56,6 +56,7 @@ io.on('connection', function (socket) {
         g.player.add(p);
         g.socket.add(socket);
         g.updatePlayers();
+        socket.emit('gameCreated', { player: p });
       } catch (err) {
         if (err.message === 'Player already exists')
           socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
@@ -76,6 +77,7 @@ io.on('connection', function (socket) {
         g.player.add(p);
         g.socket.add(socket);
         g.updatePlayers();
+        socket.emit('gameJoined', { player: p });
       } catch (err) {
         if (err.message === 'Player already exists')
           socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });

@@ -173,7 +173,7 @@ describe('Game', function () {
     g.socket.add(s2);
     g.player.add(p2);
     g.updatePlayers();
-    expect(emitted.length).equal(3);// total count of emitions
+    expect(emitted.length).equal(3);
   });
   it('Event emitions are game dependent', function () {
     const emitted = [];
@@ -219,32 +219,54 @@ describe('Game', function () {
     expect(g1.characterPerPlayer()).be.true;
   });
   it('Every Player gets assigned a Character', function () {
+    const emitted = [];
+    const g = new Game({ id: 'game1' });
+    const s1 = new SocketStub({ id: 'player1' });
+    const s2 = new SocketStub({ id: 'player2' });
+    s1.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
+    s2.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
     const p1 = new Player({ id: 'player1', name: 'player1', owner: true });
     const p2 = new Player({ id: 'player2', name: 'player2' });
     const c1 = new Character({ id: 'player1', description: 'character input by player1' });
     const c2 = new Character({ id: 'player2', description: 'character input by player2' });
-    const g1 = new Game({ id: 'game1' });
-    g1.player.add(p1);
-    g1.player.add(p2);
-    g1.character.add(c1);
-    g1.character.add(c2);
-    g1.assignCharacters();
-    expect(p1.character).equal(c2);
-    expect(p2.character).equal(c1);
-    g1.assignCharacters();
+    g.socket.add(s1);
+    g.socket.add(s2);
+    g.player.add(p1);
+    g.player.add(p2);
+    g.character.add(c1);
+    g.character.add(c2);
+    g.started = true; // Testing purposes only
+    g.assignCharacters();
+    expect(Character.prototype.isPrototypeOf(p1.character)).be.true;
+    expect(Character.prototype.isPrototypeOf(p2.character)).be.true;
     expect(p1.character).equal(c2);
     expect(p2.character).equal(c1);
   });
   it('Every Player gets assigned a Character diferent from the input one', function () {
+    const emitted = [];
     const iter = 500;
     const g = new Game({ id: 'game1' });
+    const s1 = new SocketStub({ id: 'player1' });
+    s1.on('updatePlayers', function (data) {
+      emitted.push(data)
+    })
     const p1 = new Player({ id: `player1`, name: `player1`, owner: true });
     const c1 = new Character({ id: `player1`, description: `character input by player1` });
+    g.socket.add(s1);
     g.player.add(p1);
     g.character.add(c1);
     for (let i = 2; i <= iter; i++) {
+      const s = new SocketStub({ id: `player${i}` });
+      s.on('updatePlayers', function (data) {
+        emitted.push(data)
+      })
       const p = new Player({ id: `player${i}`, name: `player${i}` });
       const c = new Character({ id: `player${i}`, description: `character input by player${i}` });
+      g.socket.add(s);
       g.player.add(p);
       g.character.add(c);
     }
