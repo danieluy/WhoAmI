@@ -45,6 +45,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
+	const Player = __webpack_require__(5);
 
 	// window.addEventListener("beforeunload", function (e) {
 	//   e.returnValue = "";
@@ -69,8 +70,7 @@
 	    if (this.socket) {
 	      this.socket.on('ERROR', this.errorHandler.bind(this));
 	      this.socket.on('TEST', this.logTest.bind(this));
-	      this.socket.on('updatePlayers', this.render.updatePlayers.bind(this));
-	      this.socket.on('updateCharacters', this.render.updateCharacters.bind(this));
+	      this.socket.on('updatePlayers', this.updatePlayers.bind(this));
 	      this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
 	      this.socket.on('gameStarted', this.gameStarted.bind(this));
 	      this.socket.on('gameCreated', this.gameCreatedJoined.bind(this));
@@ -88,13 +88,14 @@
 	    this.select_character_wrapper = document.getElementsByClassName('select-character-wrapper')[0];
 	    this.start_game_wrapper_owner = document.getElementsByClassName('start-game-wrapper-owner')[0];
 	    this.start_game_wrapper_not_owner = document.getElementsByClassName('start-game-wrapper-not-owner')[0];
+	    this.players_wrapper = document.getElementById('players-wrapper');
+	    this.players_preview_wrapper = document.getElementById('players-preview-wrapper');
 	    this.new_game_button = document.getElementById('new-game-button');
 	    this.join_game_button = document.getElementById('join-game-button');
 	    this.input_character_button = document.getElementById('input-character-button');
 	    this.game_id = document.getElementById('game-name');
 	    this.character_name = document.getElementById('character-name');
 	    this.player_name = document.getElementById('player-name');
-	    this.players_wrapper = document.getElementById('players-wrapper');
 	    this.start_game_button = document.getElementById('start-game-button');
 	    this.domListeners();
 	  },
@@ -113,8 +114,11 @@
 	  },
 
 	  gameStarted: function () {
-	    console.log('lalala')
-	    this.render.alertOk('Game started!!!')
+	    this.players_wrapper.classList.remove('hidden');
+	    if (this.gameData.player.owner)
+	      this.start_game_wrapper_owner.classList.add('hidden');
+	    else
+	      this.start_game_wrapper_not_owner.classList.add('hidden');
 	  },
 
 	  createGame: function (e) {
@@ -154,6 +158,19 @@
 	      this.start_game_wrapper_owner.classList.remove('hidden');
 	    else
 	      this.start_game_wrapper_not_owner.classList.remove('hidden');
+	    this.players_preview_wrapper.classList.remove('hidden');
+	    this.render.playersPreview.call(this);
+	  },
+
+	  updatePlayers: function (players) {
+	    for (var key in players) {
+	      this.gameData.playersList.push(new Player({
+	        id: players[key].id,
+	        name: players[key].name,
+	        owner: players[key].owner,
+	        character: players[key].character || undefined
+	      }));
+	    }
 	  },
 
 	  render: {
@@ -165,43 +182,62 @@
 	      console.error(message);
 	      alert(message)
 	    },
-	    updatePlayers: function (players) {
-	      this.gameData.playersList = players;
-	      this.players_wrapper.innerHTML = "";
-	      for (var key in players) {
-	        if (players.hasOwnProperty(key)) {
-	          var pre = document.createElement('pre');
-	          pre.innerHTML = JSON.stringify(players[key], null, 2);
-	          this.players_wrapper.appendChild(pre);
-	        }
+	    playersPreview: function () {
+	      this.players_preview_wrapper.innerHTML = '';
+	      for (var i = 0; i < this.gameData.playersList.length; i++) {
+	        this.players_preview_wrapper.appendChild(this.gameData.playersList[i].preview());
 	      }
-	    },
-	    updateCharacters: function (characters) {
-	      console.log(characters)
 	    }
 	  },
 
+	  // {
+	  //   "id": "TOkdu-sy8e21ZeaEAAAC",
+	  //   "name": "asd",
+	  //   "owner": true,
+	  //   "character": {
+	  //     "id": "-ZAbcXaNevKkRXrqAAAE",
+	  //     "description": "qwe",
+	  //     "qa": []
+	  //   }
+	  // }
+	  // {
+	  //   "id": "-ZAbcXaNevKkRXrqAAAE",
+	  //   "name": "qwe",
+	  //   "owner": false,
+	  //   "character": {
+	  //     "id": "TOkdu-sy8e21ZeaEAAAC",
+	  //     "qa": []
+	  //   }
+	  // }
+
 	  errorHandler: function (err) {
+	    if (err.code === 'parameterMismatch') {
+	      console.error(err.message);
+	      this.render.alertError(err.message);
+	    }
 	    if (err.code === 'duplicatedGame') {
+	      console.error(err.message);
 	      this.render.alertError(err.message);
 	      this.gameData.username = undefined;
 	      this.gameData.gameId = undefined;
 	    }
 	    if (err.code === 'noGame') {
+	      console.error(err.message);
 	      this.render.alertError(err.message);
 	      this.gameData.username = undefined;
 	      this.gameData.gameId = undefined;
 	    }
 	    if (err.code === 'duplicatedCharacter') {
+	      console.error(err.message);
 	      this.render.alertError(err.message);
 	    }
 	    if (err.code === 'unableToStart') {
+	      console.error(err.message);
 	      this.render.alertError(err.message);
 	    }
 	  }
 
 	}
-
 
 	module.exports = $main;
 
@@ -552,6 +588,55 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	const Player = function (values) {
+	  this.id = values.id;
+	  this.name = values.name;
+	  this.owner = values.owner;
+	  this.character = values.character;
+	}
+
+	Player.prototype.preview = function () {
+	  let wrapper = document.createElement('div');
+	  wrapper.classList.add('player-preview-wrapper');
+
+	  let name = document.createElement('span');
+	  name.classList.add('player-preview-name');
+	  name.innerHTML = this.name;
+	  wrapper.appendChild(name);
+
+	  if (this.owner) {
+	    let owner = document.createElement('span');
+	    owner.classList.add('player-preview-owner');
+	    owner.innerHTML = 
+	      '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">'
+	        +'<path d="M0 0h24v24H0z" fill="none"/>'
+	        +'<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>'
+	      +'</svg>'
+	    wrapper.appendChild(owner);
+	  }
+
+	  return wrapper;
+	}
+
+	module.exports = Player;
+
+	// {
+	//   "id": "TOkdu-sy8e21ZeaEAAAC",
+	//   "name": "asd",
+	//   "owner": true,
+	//   "character": {
+	//     "id": "-ZAbcXaNevKkRXrqAAAE",
+	//     "description": "qwe",
+	//     "qa": []
+	//   }
+	// }
 
 /***/ }
 /******/ ]);

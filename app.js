@@ -48,65 +48,75 @@ io.on('connection', function (socket) {
   })
 
   socket.on('createGame', function (data) {
-    if (!games.hasOwnProperty(data.gameId)) {
-      const g = new Game({ id: data.gameId });
-      games[data.gameId] = g;
-      const p = new Player({ id: socket.id, name: data.username, owner: true });
-      try {
-        g.player.add(p);
-        g.socket.add(socket);
-        g.updatePlayers();
-        socket.emit('gameCreated', { player: p });
-      } catch (err) {
-        if (err.message === 'Player already exists')
-          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
-        if (err.message === 'Socket already exists')
-          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated socket id: ${data.username}` });
+    if (data.gameId && data.username && data.gameId !== '' && data.username !== '') {
+      if (!games.hasOwnProperty(data.gameId)) {
+        const g = new Game({ id: data.gameId });
+        games[data.gameId] = g;
+        const p = new Player({ id: socket.id, name: data.username, owner: true });
+        try {
+          g.player.add(p);
+          g.socket.add(socket);
+          g.updatePlayers();
+          socket.emit('gameCreated', { player: p });
+        } catch (err) {
+          if (err.message === 'Player already exists')
+            socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
+          if (err.message === 'Socket already exists')
+            socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated socket id: ${data.username}` });
+        }
       }
+      else
+        socket.emit('ERROR', { code: 'duplicatedGame', message: `There is already a game called ${data.gameId}` });
     }
-    else {
-      socket.emit('ERROR', { code: 'duplicatedGame', message: `There is already a game called ${data.gameId}` });
-    }
+    else
+      socket.emit('ERROR', { code: 'parameterMismatch', message: `The parameters gameId and username must be provided` });
   });
 
   socket.on('joinGame', function (data) {
-    if (games.hasOwnProperty(data.gameId)) {
-      const g = games[data.gameId];
-      const p = new Player({ id: socket.id, name: data.username, owner: false });
-      try {
-        g.player.add(p);
-        g.socket.add(socket);
-        g.updatePlayers();
-        socket.emit('gameJoined', { player: p });
-      } catch (err) {
-        if (err.message === 'Player already exists')
-          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
-        if (err.message === 'Socket already exists')
-          socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated socket id: ${data.username}` });
+    if (data.gameId && data.username && data.gameId !== '' && data.username !== '') {
+      if (games.hasOwnProperty(data.gameId)) {
+        const g = games[data.gameId];
+        const p = new Player({ id: socket.id, name: data.username, owner: false });
+        try {
+          g.player.add(p);
+          g.socket.add(socket);
+          g.updatePlayers();
+          socket.emit('gameJoined', { player: p });
+        } catch (err) {
+          if (err.message === 'Player already exists')
+            socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated player id: ${data.username}` });
+          if (err.message === 'Socket already exists')
+            socket.emit('ERROR', { code: 'duplicatedPlayer', message: `Duplicated socket id: ${data.username}` });
+        }
       }
+      else
+        socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
     }
-    else {
-      socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
-    }
-  })
+    else
+      socket.emit('ERROR', { code: 'parameterMismatch', message: `The parameters gameId and username must be provided` });
+  });
 
   socket.on('inputCharacter', function (data) {
-    if (games.hasOwnProperty(data.gameId)) {
-      const g = games[data.gameId];
-      let c = new Character({ id: socket.id, description: data.character });
-      try {
-        g.character.add(c);
-        socket.emit('inputCharacterDone');
-        io.emit('TEST', g.character.characters)
+    if (data.gameId && data.character && data.gameId !== '' && data.character !== '') {
+      if (games.hasOwnProperty(data.gameId)) {
+        const g = games[data.gameId];
+        let c = new Character({ id: socket.id, description: data.character });
+        try {
+          g.character.add(c);
+          socket.emit('inputCharacterDone');
+          io.emit('TEST', g.character.characters)
+        }
+        catch (err) {
+          socket.emit('ERROR', { code: 'duplicatedCharacter', message: `Duplicated character id: ${data.username}` });
+        }
       }
-      catch (err) {
-        socket.emit('ERROR', { code: 'duplicatedCharacter', message: `Duplicated character id: ${data.username}` });
+      else {
+        socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
       }
     }
-    else {
-      socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
-    }
-  })
+    else
+      socket.emit('ERROR', { code: 'parameterMismatch', message: `The parameters gameId and character must be provided` });
+  });
 
   socket.on('startGame', function (data) {
     if (games.hasOwnProperty(data.gameId)) {
@@ -114,15 +124,15 @@ io.on('connection', function (socket) {
       const p = g.player.get(socket.id)
       try {
         g.startGame(p);
+        io.emit('gameStarted');
       }
       catch (err) {
         socket.emit('ERROR', { code: 'notTheOwner', message: `The game can only be started by its owner` });
       }
     }
-    else {
+    else
       socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
-    }
-  })
+  });
 
   socket.on('disconnect', function () {
     // console.log('player disconnected');
