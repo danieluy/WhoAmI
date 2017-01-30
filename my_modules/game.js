@@ -4,8 +4,10 @@ const Player = require('./player.js');
 const Character = require('./character.js');
 
 const Game = function (values) {
+  
   this.id = values.id || undefined;
   this.started = false;
+
   this.updatePlayers = function () {
     if (this.started) {
       for (let key1 in this.player.players) {
@@ -46,6 +48,7 @@ const Game = function (values) {
       }
     }
   };
+
   this.characterPerPlayer = function () {
     for (var key in this.player.players) {
       if (!this.character.characters.hasOwnProperty(key))
@@ -53,6 +56,7 @@ const Game = function (values) {
     }
     return true;
   };
+
   this.startGame = function (player) { // NEEDS TESTING
     if (Object.keys(this.character.characters).length > 1) {
       if (player && player.owner) {
@@ -69,6 +73,7 @@ const Game = function (values) {
     else
       throw new Error('Not enough players, the required minimum is two');
   };
+
   this.assignCharacters = function () {
     const assingned_characters = {};
     const character_ids = Object.keys(this.character.characters);
@@ -85,6 +90,7 @@ const Game = function (values) {
     };
     this.updatePlayers();
   };
+
   this.player = {
     players: {},
     add: function (player) {
@@ -102,6 +108,7 @@ const Game = function (values) {
       delete this.players[player_id];
     }
   };
+
   this.socket = {
     sockets: {},
     add: function (socket) {
@@ -117,6 +124,7 @@ const Game = function (values) {
       delete this.sockets[socket_id];
     }
   };
+
   this.character = {
     characters: {},
     add: function (character) {

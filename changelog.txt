@@ -1,6 +1,11 @@
-v0.2.0
+# Who am I Changelog
+v?.?.?
     20170124 | TODO | Test Game.updatePlayers()
     20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
+v0.2.1
+    20170130 | + | Added Character and Qa classes on frontend
+    20170130 | + | Added Main.render.players() method on frontend
+v0.2.0
     20170125 | + | Started the UX design
     20170125 | + | Added response events to handle successful actions
     20170125 | - | Remove the button's disabling at event send, and button's re-enabling on error handling

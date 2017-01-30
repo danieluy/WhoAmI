@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 });
 
 var $main = {
-  gameData: {
-    username: undefined,
-    gameId: undefined,
-    player: undefined,
-    playersList: []
-  },
+
+  username: undefined,
+  gameId: undefined,
+  player: undefined,
+  game_started: false,
+  playersList: [],
 
   init: function () {
     this.socket = io();
@@ -24,11 +24,11 @@ var $main = {
     if (this.socket) {
       this.socket.on('ERROR', this.errorHandler.bind(this));
       this.socket.on('TEST', this.logTest.bind(this));
-      this.socket.on('updatePlayers', this.updatePlayers.bind(this));
       this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
-      this.socket.on('gameStarted', this.gameStarted.bind(this));
       this.socket.on('gameCreated', this.gameCreatedJoined.bind(this));
+      this.socket.on('updatePlayers', this.updatePlayers.bind(this));
       this.socket.on('gameJoined', this.gameCreatedJoined.bind(this));
+      this.socket.on('gameStarted', this.gameStarted.bind(this));
     }
   },
 
@@ -63,68 +63,74 @@ var $main = {
 
   startGame: function () {
     this.socket.emit('startGame', {
-      gameId: this.gameData.gameId
-    })
+      gameId: this.gameId
+    });
   },
 
   gameStarted: function () {
     this.players_wrapper.classList.remove('hidden');
-    if (this.gameData.player.owner)
+    if (this.player.owner)
       this.start_game_wrapper_owner.classList.add('hidden');
     else
       this.start_game_wrapper_not_owner.classList.add('hidden');
+    this.players_preview_wrapper.classList.add('hidden');
+    this.game_started = true;
   },
 
   createGame: function (e) {
-    this.gameData.username = this.player_name.value;
-    this.gameData.gameId = this.game_id.value;
+    this.username = this.player_name.value;
+    this.gameId = this.game_id.value;
     this.socket.emit('createGame', {
-      gameId: this.gameData.gameId,
-      username: this.gameData.username
+      gameId: this.gameId,
+      username: this.username
     });
   },
 
   gameCreatedJoined: function (data) {
-    this.gameData.player = data.player;
+    this.player = data.player;
     this.start_wrapper.classList.add('hidden');
     this.select_character_wrapper.classList.remove('hidden');
   },
 
   joinGame: function () {
-    this.gameData.username = this.player_name.value;
-    this.gameData.gameId = this.game_id.value;
+    this.username = this.player_name.value;
+    this.gameId = this.game_id.value;
     this.socket.emit('joinGame', {
-      gameId: this.gameData.gameId,
-      username: this.gameData.username
+      gameId: this.gameId,
+      username: this.username
     });
   },
 
   inputCharacter: function () {
     this.socket.emit('inputCharacter', {
-      gameId: this.gameData.gameId,
+      gameId: this.gameId,
       character: this.character_name.value
-    })
+    });
   },
 
   inputCharacterDone: function () {
     this.select_character_wrapper.classList.add('hidden');
-    if (this.gameData.player.owner)
+    if (this.player.owner)
       this.start_game_wrapper_owner.classList.remove('hidden');
     else
       this.start_game_wrapper_not_owner.classList.remove('hidden');
     this.players_preview_wrapper.classList.remove('hidden');
-    this.render.playersPreview.call(this);
   },
 
   updatePlayers: function (players) {
+    this.playersList = [];
     for (var key in players) {
-      this.gameData.playersList.push(new Player({
+      this.playersList.push(new Player({
         id: players[key].id,
         name: players[key].name,
         owner: players[key].owner,
         character: players[key].character || undefined
       }));
     }
+    if (this.game_started)
+      this.render.players.call(this);
+    else
+      this.render.playersPreview.call(this);
   },
 
   render: {
@@ -138,8 +144,13 @@ var $main = {
     },
     playersPreview: function () {
       this.players_preview_wrapper.innerHTML = '';
-      for (var i = 0; i < this.gameData.playersList.length; i++) {
-        this.players_preview_wrapper.appendChild(this.gameData.playersList[i].preview());
+      for (var i = 0; i < this.playersList.length; i++)
+        this.players_preview_wrapper.appendChild(this.playersList[i].preview());
+    },
+    players: function () {
+      this.players_wrapper.innerHTML = '';
+      for (var i = 0; i < this.playersList.length; i++) {
+        this.players_wrapper.appendChild(this.playersList[i].view());
       }
     }
   },
@@ -172,14 +183,14 @@ var $main = {
     if (err.code === 'duplicatedGame') {
       console.error(err.message);
       this.render.alertError(err.message);
-      this.gameData.username = undefined;
-      this.gameData.gameId = undefined;
+      this.username = undefined;
+      this.gameId = undefined;
     }
     if (err.code === 'noGame') {
       console.error(err.message);
       this.render.alertError(err.message);
-      this.gameData.username = undefined;
-      this.gameData.gameId = undefined;
+      this.username = undefined;
+      this.gameId = undefined;
     }
     if (err.code === 'duplicatedCharacter') {
       console.error(err.message);

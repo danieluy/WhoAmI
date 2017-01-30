@@ -57,12 +57,12 @@
 	});
 
 	var $main = {
-	  gameData: {
-	    username: undefined,
-	    gameId: undefined,
-	    player: undefined,
-	    playersList: []
-	  },
+
+	  username: undefined,
+	  gameId: undefined,
+	  player: undefined,
+	  game_started: false,
+	  playersList: [],
 
 	  init: function () {
 	    this.socket = io();
@@ -70,11 +70,11 @@
 	    if (this.socket) {
 	      this.socket.on('ERROR', this.errorHandler.bind(this));
 	      this.socket.on('TEST', this.logTest.bind(this));
-	      this.socket.on('updatePlayers', this.updatePlayers.bind(this));
 	      this.socket.on('inputCharacterDone', this.inputCharacterDone.bind(this));
-	      this.socket.on('gameStarted', this.gameStarted.bind(this));
 	      this.socket.on('gameCreated', this.gameCreatedJoined.bind(this));
+	      this.socket.on('updatePlayers', this.updatePlayers.bind(this));
 	      this.socket.on('gameJoined', this.gameCreatedJoined.bind(this));
+	      this.socket.on('gameStarted', this.gameStarted.bind(this));
 	    }
 	  },
 
@@ -109,68 +109,74 @@
 
 	  startGame: function () {
 	    this.socket.emit('startGame', {
-	      gameId: this.gameData.gameId
-	    })
+	      gameId: this.gameId
+	    });
 	  },
 
 	  gameStarted: function () {
 	    this.players_wrapper.classList.remove('hidden');
-	    if (this.gameData.player.owner)
+	    if (this.player.owner)
 	      this.start_game_wrapper_owner.classList.add('hidden');
 	    else
 	      this.start_game_wrapper_not_owner.classList.add('hidden');
+	    this.players_preview_wrapper.classList.add('hidden');
+	    this.game_started = true;
 	  },
 
 	  createGame: function (e) {
-	    this.gameData.username = this.player_name.value;
-	    this.gameData.gameId = this.game_id.value;
+	    this.username = this.player_name.value;
+	    this.gameId = this.game_id.value;
 	    this.socket.emit('createGame', {
-	      gameId: this.gameData.gameId,
-	      username: this.gameData.username
+	      gameId: this.gameId,
+	      username: this.username
 	    });
 	  },
 
 	  gameCreatedJoined: function (data) {
-	    this.gameData.player = data.player;
+	    this.player = data.player;
 	    this.start_wrapper.classList.add('hidden');
 	    this.select_character_wrapper.classList.remove('hidden');
 	  },
 
 	  joinGame: function () {
-	    this.gameData.username = this.player_name.value;
-	    this.gameData.gameId = this.game_id.value;
+	    this.username = this.player_name.value;
+	    this.gameId = this.game_id.value;
 	    this.socket.emit('joinGame', {
-	      gameId: this.gameData.gameId,
-	      username: this.gameData.username
+	      gameId: this.gameId,
+	      username: this.username
 	    });
 	  },
 
 	  inputCharacter: function () {
 	    this.socket.emit('inputCharacter', {
-	      gameId: this.gameData.gameId,
+	      gameId: this.gameId,
 	      character: this.character_name.value
-	    })
+	    });
 	  },
 
 	  inputCharacterDone: function () {
 	    this.select_character_wrapper.classList.add('hidden');
-	    if (this.gameData.player.owner)
+	    if (this.player.owner)
 	      this.start_game_wrapper_owner.classList.remove('hidden');
 	    else
 	      this.start_game_wrapper_not_owner.classList.remove('hidden');
 	    this.players_preview_wrapper.classList.remove('hidden');
-	    this.render.playersPreview.call(this);
 	  },
 
 	  updatePlayers: function (players) {
+	    this.playersList = [];
 	    for (var key in players) {
-	      this.gameData.playersList.push(new Player({
+	      this.playersList.push(new Player({
 	        id: players[key].id,
 	        name: players[key].name,
 	        owner: players[key].owner,
 	        character: players[key].character || undefined
 	      }));
 	    }
+	    if (this.game_started)
+	      this.render.players.call(this);
+	    else
+	      this.render.playersPreview.call(this);
 	  },
 
 	  render: {
@@ -184,8 +190,13 @@
 	    },
 	    playersPreview: function () {
 	      this.players_preview_wrapper.innerHTML = '';
-	      for (var i = 0; i < this.gameData.playersList.length; i++) {
-	        this.players_preview_wrapper.appendChild(this.gameData.playersList[i].preview());
+	      for (var i = 0; i < this.playersList.length; i++)
+	        this.players_preview_wrapper.appendChild(this.playersList[i].preview());
+	    },
+	    players: function () {
+	      this.players_wrapper.innerHTML = '';
+	      for (var i = 0; i < this.playersList.length; i++) {
+	        this.players_wrapper.appendChild(this.playersList[i].view());
 	      }
 	    }
 	  },
@@ -218,14 +229,14 @@
 	    if (err.code === 'duplicatedGame') {
 	      console.error(err.message);
 	      this.render.alertError(err.message);
-	      this.gameData.username = undefined;
-	      this.gameData.gameId = undefined;
+	      this.username = undefined;
+	      this.gameId = undefined;
 	    }
 	    if (err.code === 'noGame') {
 	      console.error(err.message);
 	      this.render.alertError(err.message);
-	      this.gameData.username = undefined;
-	      this.gameData.gameId = undefined;
+	      this.username = undefined;
+	      this.gameId = undefined;
 	    }
 	    if (err.code === 'duplicatedCharacter') {
 	      console.error(err.message);
@@ -276,7 +287,7 @@
 
 
 	// module
-	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n  margin: 0px;\r\n  padding: 0px;\r\n  box-sizing: border-box;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: rgba(255, 255, 255, .6);\r\n  font-size: 16px;\r\n}\r\nbody{\r\n  height: 100vh;\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: #333;\r\n  font-size: 16px;\r\n  background-color: #8cc;\r\n  border: 20px solid rgba(255, 255, 255, .6);\r\n  box-shadow: inset 0 0 10px rgba(0, 0, 0, .25);\r\n}\r\nh1{\r\n  font-size: 3rem;\r\n  font-weight: 900;\r\n  text-align: center;\r\n  line-height: 90px;\r\n}\r\nh2{\r\n  font-size: 2rem;\r\n  font-weight: 500;\r\n  text-align: center;\r\n  line-height: 60px;\r\n}\r\n.start-wrapper,\r\n.select-character-wrapper{\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  /*background-color: rgba(255, 255, 255, .6);*/\r\n  width: 50%;\r\n  min-height: 300px;\r\n  border: 10px solid rgba(255, 255, 255, .6);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);\r\n  background-color: #8dd;\r\n}\r\n.start-wrapper-section{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n  justify-content: center;\r\n  align-items: center;\r\n}\r\n.users-wrapper{\r\n  width: 50%;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}\r\ninput{\r\n  background-color: transparent;\r\n  border-style: none;\r\n  color: #fff;\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  text-align: center;\r\n}\r\nbutton{\r\n  background-color: transparent;\r\n  /*border: 5px solid #fff;*/\r\n  border-style: none;\r\n  color: rgba(255, 255, 255, .5);\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  transition: color 300ms ease-out;\r\n}\r\nbutton:hover{\r\n  color: #fff;\r\n}\r\n.hidden{\r\n  display: none;\r\n}\r\n/*--  Placeholders  -----------------------------------------------------------------*/\r\n::-webkit-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n::-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-ms-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}", ""]);
+	exports.push([module.id, "/*--  Reset  -----------------------------------------------------------------*/\r\n*, html{\r\n  margin: 0px;\r\n  padding: 0px;\r\n  box-sizing: border-box;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: rgba(255, 255, 255, .6);\r\n  font-size: 16px;\r\n}\r\nbody{\r\n  height: 100vh;\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  font-family: Roboto, FreeSans, Helvetica, Arial, sans-serif;\r\n  color: #333;\r\n  font-size: 16px;\r\n  background-color: #8cc;\r\n  border: 20px solid rgba(255, 255, 255, .6);\r\n  box-shadow: inset 0 0 10px rgba(0, 0, 0, .25);\r\n}\r\nh1{\r\n  font-size: 3rem;\r\n  font-weight: 900;\r\n  text-align: center;\r\n  line-height: 90px;\r\n}\r\nh2{\r\n  font-size: 2rem;\r\n  font-weight: 500;\r\n  text-align: center;\r\n  line-height: 60px;\r\n}\r\n.start-wrapper,\r\n.select-character-wrapper{\r\n  display: flex;\r\n  flex-direction: column;\r\n  justify-content: space-around;\r\n  align-items: center;\r\n  width: 50%;\r\n  min-height: 300px;\r\n  border: 10px solid rgba(255, 255, 255, .6);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);\r\n  background-color: #8dd;\r\n}\r\n.start-wrapper-section{\r\n  width: 100%;\r\n  display: flex;\r\n  flex-direction: row;\r\n  justify-content: center;\r\n  align-items: center;\r\n}\r\n.users-wrapper{\r\n  width: 50%;\r\n}\r\n.user-card{\r\n  width: 25%;\r\n}\r\n.user-name{\r\n  display: block;\r\n  font-size: 2rem;\r\n}\r\ninput{\r\n  background-color: transparent;\r\n  border-style: none;\r\n  color: #fff;\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  text-align: center;\r\n}\r\nbutton{\r\n  background-color: transparent;\r\n  border-style: none;\r\n  color: rgba(255, 255, 255, .5);\r\n  font-size: 1.5rem;\r\n  font-weight: 700;\r\n  padding: 20px;\r\n  transition: color 300ms ease-out;\r\n}\r\nbutton:hover{\r\n  color: #fff;\r\n}\r\n.hidden{\r\n  display: none !important;\r\n}\r\n/*--  Players preview  --------------------------------------------------------------*/\r\n#players-preview-wrapper{\r\n  width: 50%;\r\n  display: flex;\r\n  flex-direction: row;\r\n  justify-content: center;\r\n  align-items: center;\r\n  flex-wrap: wrap;\r\n}\r\n.player-preview-wrapper{\r\n  height: 50px;\r\n  background-color: rgba(255, 255, 255, .25);\r\n  box-shadow: 0 2px 4px rgba(0, 0, 0, .25);\r\n  padding: 10px;\r\n  border-style: none;\r\n  border-radius: 3px;\r\n  margin: 3px;\r\n}\r\n.player-preview-name{\r\n  line-height: 30px;\r\n  color: #fff;\r\n  font-weight: 500;\r\n  float: left;\r\n}\r\n.player-preview-owner{\r\n  float: left;\r\n  padding: 3px 0 3px 10px;\r\n}\r\n.player-preview-owner svg{\r\n  fill: #fff;\r\n}\r\n/*--  Placeholders  -----------------------------------------------------------------*/\r\n::-webkit-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n::-moz-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}\r\n:-ms-input-placeholder {\r\n  color: rgba(0, 0, 0, .25);\r\n  font-weight: 500;\r\n}", ""]);
 
 	// exports
 
@@ -591,15 +602,20 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
+	const Character = __webpack_require__(6);
+
 	const Player = function (values) {
-	  this.id = values.id;
-	  this.name = values.name;
-	  this.owner = values.owner;
-	  this.character = values.character;
+
+	  this.id = values.id; // :string
+	  this.name = values.name; // :string
+	  this.owner = values.owner; // :boolean
+	  this.character = undefined; // :Character
+	  if (values.character)
+	    this.character = new Character(values.character);
 	}
 
 	Player.prototype.preview = function () {
@@ -614,29 +630,124 @@
 	  if (this.owner) {
 	    let owner = document.createElement('span');
 	    owner.classList.add('player-preview-owner');
-	    owner.innerHTML = 
+	    owner.innerHTML =
 	      '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">'
-	        +'<path d="M0 0h24v24H0z" fill="none"/>'
-	        +'<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>'
-	      +'</svg>'
+	      + '<path d="M0 0h24v24H0z" fill="none"/>'
+	      + '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>'
+	      + '</svg>'
 	    wrapper.appendChild(owner);
 	  }
 
 	  return wrapper;
 	}
 
+	Player.prototype.view = function () {
+	  let wrapper = document.createElement('div');
+	  wrapper.classList.add('player-wrapper');
+
+	  let name = document.createElement('span');
+	  name.classList.add('player-name');
+	  name.innerHTML = this.name;
+	  wrapper.appendChild(name);
+
+	  if (this.owner) {
+	    let owner = document.createElement('span');
+	    owner.classList.add('player-owner');
+	    owner.innerHTML =
+	      '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">'
+	      + '<path d="M0 0h24v24H0z" fill="none"/>'
+	      + '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>'
+	      + '</svg>'
+	    wrapper.appendChild(owner);
+	  }
+
+	  let character = this.character.view();
+	  wrapper.appendChild(character);
+
+	  return wrapper;
+	}
+
 	module.exports = Player;
 
-	// {
-	//   "id": "TOkdu-sy8e21ZeaEAAAC",
-	//   "name": "asd",
-	//   "owner": true,
-	//   "character": {
-	//     "id": "-ZAbcXaNevKkRXrqAAAE",
-	//     "description": "qwe",
-	//     "qa": []
-	//   }
-	// }
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	const Qa = __webpack_require__(7);
+
+	const Character = function (values) {
+	  this.id = values.id; // :string
+	  this.description = undefined; // :string
+	  this.qa = undefined; // :Array<Qa>
+	  if (values.description)
+	    this.description = values.description;
+	  if (values.qa)
+	    this.qa = values.qa.map(qa => new Qa(qa));
+	}
+
+	Character.prototype.view = function () {
+	  let div = document.createElement('div');
+
+	  let description = document.createElement('div');
+	  description.innerHTML = this.description ? this.description :  '·········';
+	  div.appendChild(description);
+
+	  if (this.qa) {
+	    let qas = document.createElement('div');
+	    for (var i = 0; i < this.qa.length; i++) {
+	      qas.appendChild(this.qa[i].view());
+	    }
+	    div.appendChild(qas);
+	  }
+	  
+	  return div;
+	}
+
+	module.exports = Character;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	const Qa = function (values) {
+	  this.question = values.q; // :string
+	  this.answer = values.a; // :boolean
+	}
+
+	Qa.prototype.view = function () {
+	  let div = document.createElement('div');
+
+	  let question = document.createElement('div');
+	  question.innerHTML = this.question;
+	  div.appendChild(question);
+
+	  let answer = document.createElement('div');
+	  if (this.answer)
+	    answer.innerHTML =
+	      '<svg fill="#fff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">' +
+	        '<path d="M0 0h24v24H0z" fill="none"/>' +
+	        '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>' +
+	      '</svg>';
+	  else
+	    answer.innerHTML =
+	      '<svg fill="#888" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">' +
+	        '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>' +
+	        '<path d="M0 0h24v24H0z" fill="none"/>' +
+	      '</svg>';
+
+	  div.appendChild(answer);
+
+	  return div;
+	}
+
+	module.exports = Qa;
+
+
+
 
 /***/ }
 /******/ ]);

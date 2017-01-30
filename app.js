@@ -37,14 +37,13 @@ io.on('connection', function (socket) {
       const p = g.player.get(socket.id);
       try {
         g.startGame(p);
-        socket.emit('gameStarted');
+        io.emit('gameStarted');
       } catch (err) {
         socket.emit('ERROR', { code: 'unableToStart', message: err.message });
       }
     }
-    else {
+    else
       socket.emit('ERROR', { code: 'noGame', message: `The game ${data.gameId} does not exists` });
-    }
   })
 
   socket.on('createGame', function (data) {
@@ -103,8 +102,8 @@ io.on('connection', function (socket) {
         let c = new Character({ id: socket.id, description: data.character });
         try {
           g.character.add(c);
-          socket.emit('inputCharacterDone');
-          io.emit('TEST', g.character.characters)
+          io.emit('inputCharacterDone');
+          io.emit('TEST', g.player.players);
         }
         catch (err) {
           socket.emit('ERROR', { code: 'duplicatedCharacter', message: `Duplicated character id: ${data.username}` });

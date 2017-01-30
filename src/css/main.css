@@ -38,7 +38,6 @@ h2{
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  /*background-color: rgba(255, 255, 255, .6);*/
   width: 50%;
   min-height: 300px;
   border: 10px solid rgba(255, 255, 255, .6);
@@ -73,7 +72,6 @@ input{
 }
 button{
   background-color: transparent;
-  /*border: 5px solid #fff;*/
   border-style: none;
   color: rgba(255, 255, 255, .5);
   font-size: 1.5rem;
@@ -85,7 +83,38 @@ button:hover{
   color: #fff;
 }
 .hidden{
-  display: none;
+  display: none !important;
+}
+/*--  Players preview  --------------------------------------------------------------*/
+#players-preview-wrapper{
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.player-preview-wrapper{
+  height: 50px;
+  background-color: rgba(255, 255, 255, .25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .25);
+  padding: 10px;
+  border-style: none;
+  border-radius: 3px;
+  margin: 3px;
+}
+.player-preview-name{
+  line-height: 30px;
+  color: #fff;
+  font-weight: 500;
+  float: left;
+}
+.player-preview-owner{
+  float: left;
+  padding: 3px 0 3px 10px;
+}
+.player-preview-owner svg{
+  fill: #fff;
 }
 /*--  Placeholders  -----------------------------------------------------------------*/
 ::-webkit-input-placeholder {
