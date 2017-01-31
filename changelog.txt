@@ -3,6 +3,7 @@ v?.?.?
     20170124 | TODO | Test Game.updatePlayers()
     20170121 | TODO | Add length property to Game.player, Game.socket and Game.character
 v0.2.1
+    20170131 | + | Working on assignTurns() method
     20170130 | + | Added Character and Qa classes on frontend
     20170130 | + | Added Main.render.players() method on frontend
 v0.2.0

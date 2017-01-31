@@ -16,6 +16,7 @@ var $main = {
   gameId: undefined,
   player: undefined,
   game_started: false,
+  my_turn: undefined,
   playersList: [],
 
   init: function () {
