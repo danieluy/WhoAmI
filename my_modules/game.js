@@ -74,15 +74,15 @@ Game.prototype.startGame = function (player) { // NEEDS TESTING
 };
 Game.prototype.assignTurns = function () { // NEEDS TESTING
   const keys = Object.keys(this.player.players);
-  const assigned = {};
+  const assigned = [];
   for (var key in this.player.players) {
+    const player = this.player.players[key];
     let i = 0;
-    while (assigned.hasOwnProperty(keys[i]))
+    while ((assigned.indexOf(keys[i]) >= 0 || player.id === keys[i]) && assigned.length <= keys.length)
       i = Math.floor(Math.random() * keys.length);
-    assigned[keys[i]] = null;
-    this.player.players[key].next_player = this.player.players[keys[i]].id;
+    assigned.push(keys[i]);
+    player.next_player = this.player.players[keys[i]].id;
   }
-  // emit ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 };
 Game.prototype.updatePlayers = function () {
   if (this.started) {
